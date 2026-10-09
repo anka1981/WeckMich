@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.core.app.NotificationManagerCompat
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +44,11 @@ import java.time.LocalTime
 
 /** Vollbild über dem Sperrbildschirm, solange ein Wecker klingelt. */
 class RingingActivity : ComponentActivity() {
+    companion object {
+        const val EXTRA_EMERGENCY_NOTIFICATION = "emergencyNotification"
+        const val EXTRA_EMERGENCY_LABEL = "emergencyLabel"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (Build.VERSION.SDK_INT >= 27) {
@@ -54,6 +60,21 @@ class RingingActivity : ComponentActivity() {
         }
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         AlarmStore.init(this)
+        val emergencyId = intent.getIntExtra(EXTRA_EMERGENCY_NOTIFICATION, -1)
+        if (emergencyId >= 0) {
+            // Notfall-Klingeln (Benachrichtigung mit wiederholtem Ton): „Beenden“ entfernt sie.
+            val label = intent.getStringExtra(EXTRA_EMERGENCY_LABEL).orEmpty()
+            setContent {
+                WeckerTheme {
+                    BackHandler { }
+                    RingingScreen(label = label, snoozeMinutes = 0, onSnooze = null, onDismiss = {
+                        NotificationManagerCompat.from(this).cancel(emergencyId)
+                        finish()
+                    })
+                }
+            }
+            return
+        }
         setContent {
             WeckerTheme {
                 val alarm by RingingState.ringing.collectAsState()
@@ -71,7 +92,7 @@ class RingingActivity : ComponentActivity() {
 }
 
 @Composable
-private fun RingingScreen(label: String, snoozeMinutes: Int, onSnooze: () -> Unit, onDismiss: () -> Unit) {
+private fun RingingScreen(label: String, snoozeMinutes: Int, onSnooze: (() -> Unit)?, onDismiss: () -> Unit) {
     val now by produceState(LocalTime.now()) {
         while (true) {
             value = LocalTime.now()
@@ -92,10 +113,12 @@ private fun RingingScreen(label: String, snoozeMinutes: Int, onSnooze: () -> Uni
             )
             Spacer(Modifier.weight(1.5f))
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
-                FilledTonalButton(onClick = onSnooze, modifier = Modifier.weight(1f).height(72.dp)) {
-                    Icon(Icons.Filled.Snooze, null, Modifier.size(24.dp))
-                    Spacer(Modifier.size(8.dp))
-                    Text("$snoozeMinutes Min.", style = MaterialTheme.typography.titleMedium)
+                if (onSnooze != null) {
+                    FilledTonalButton(onClick = onSnooze, modifier = Modifier.weight(1f).height(72.dp)) {
+                        Icon(Icons.Filled.Snooze, null, Modifier.size(24.dp))
+                        Spacer(Modifier.size(8.dp))
+                        Text("$snoozeMinutes Min.", style = MaterialTheme.typography.titleMedium)
+                    }
                 }
                 Button(onClick = onDismiss, modifier = Modifier.weight(1f).height(72.dp)) {
                     Icon(Icons.Filled.AlarmOff, null, Modifier.size(24.dp))

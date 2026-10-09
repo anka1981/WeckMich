@@ -134,10 +134,10 @@ fun <T> OptionDialog(
 
 /** − Wert + */
 @Composable
-fun Stepper(value: Int, range: IntRange, label: String, onChange: (Int) -> Unit) {
+fun Stepper(value: Int, range: IntRange, label: String, what: String = "", onChange: (Int) -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FilledTonalIconButton(onClick = { onChange(value - 1) }, enabled = value > range.first) {
-            Icon(Icons.Filled.Remove, "Weniger")
+            Icon(Icons.Filled.Remove, "$what verringern".trim())
         }
         Text(
             label,
@@ -146,7 +146,7 @@ fun Stepper(value: Int, range: IntRange, label: String, onChange: (Int) -> Unit)
             modifier = Modifier.widthIn(min = 56.dp),
         )
         FilledTonalIconButton(onClick = { onChange(value + 1) }, enabled = value < range.last) {
-            Icon(Icons.Filled.Add, "Mehr")
+            Icon(Icons.Filled.Add, "$what erhöhen".trim())
         }
     }
 }

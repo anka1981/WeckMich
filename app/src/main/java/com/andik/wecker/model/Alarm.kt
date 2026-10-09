@@ -36,6 +36,8 @@ data class Alarm(
     val lastPauseUnit: PauseUnit = PauseUnit.WEEKS,
     /** Ortszeit des zuletzt geklungenen regulären Termins – wird nie erneut geplant. */
     val lastRung: LocalDateTime? = null,
+    /** Zeitzone, in der [lastRung] galt; in einer anderen Zone wird er ignoriert. */
+    val lastRungZone: String? = null,
 ) {
     val time: LocalTime get() = LocalTime.of(hour, minute)
 
@@ -81,9 +83,21 @@ data class Alarm(
      * 02:30 Winterzeit. [lastRung] verhindert das (und ein zweites Klingeln um 02:30 Winterzeit),
      * und ein Termin, dessen erste Variante schon vorbei ist, bekommt die spätere.
      */
-    fun nextRegularInstant(now: Instant, zone: ZoneId, lastRung: LocalDateTime? = null): Instant? {
+    fun nextRegularInstant(
+        now: Instant,
+        zone: ZoneId,
+        lastRung: LocalDateTime? = null,
+        lastRungZone: String? = zone.id,
+    ): Instant? {
         val nowLocal = LocalDateTime.ofInstant(now, zone)
-        var after = if (lastRung != null && lastRung.isAfter(nowLocal)) lastRung else nowLocal
+        // lastRung zählt nur in derselben Zone und höchstens etwas über jetzt hinaus (doppelte Stunde
+        // im Herbst): Nach einem Zeitzonenwechsel nach Westen oder einer zurückgestellten Uhr fielen
+        // sonst Termine bis zum alten lastRung still aus.
+        val relevant = lastRung?.takeIf {
+            (lastRungZone == null || lastRungZone == zone.id) &&
+                it.isAfter(nowLocal) && !it.isAfter(nowLocal.plusHours(LAST_RUNG_HORIZON_HOURS))
+        }
+        var after = relevant ?: nowLocal
         repeat(4) {
             val local = nextRegularOccurrence(after) ?: return null
             val zoned = local.atZone(zone)
@@ -122,6 +136,8 @@ data class Alarm(
     }
 
     companion object {
+        private const val LAST_RUNG_HORIZON_HOURS = 2L
+
         /** Ein Wecker gilt erst als verpasst, wenn sein Zeitpunkt länger als das zurückliegt. */
         const val MISSED_GRACE_MILLIS = 60_000L
     }

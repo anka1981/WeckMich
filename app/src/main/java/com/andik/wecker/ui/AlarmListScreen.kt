@@ -292,11 +292,11 @@ private fun AlarmCard(
                     fontSize = 52.sp,
                     fontWeight = FontWeight.Light,
                     color = if (active) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                    modifier = Modifier.clickable { editTime = true },
+                    modifier = Modifier.clickable(onClickLabel = "Uhrzeit ändern") { editTime = true },
                 )
                 Spacer(Modifier.weight(1f))
                 Switch(
-                    modifier = Modifier.semantics { contentDescription = "Wecker ${Format.time(alarm.hour, alarm.minute)} ein" },
+                    modifier = Modifier.semantics { contentDescription = "Wecker ${Format.time(alarm.hour, alarm.minute)}" },
                     checked = alarm.enabled, onCheckedChange = {
                     saveAndAnnounce(context, alarm.copy(enabled = it, snoozeUntil = null, temporary = false).let { a -> if (it) a.rearmed() else a })
                 })
@@ -315,7 +315,10 @@ private fun AlarmCard(
             if (expanded) {
                 Spacer(Modifier.size(12.dp))
                 DayCircles(alarm.recurrence.selectedDays()) { d ->
-                    saveAndAnnounce(context, alarm.copy(enabled = true, recurrence = alarm.recurrence.toggleDay(d, today)))
+                    alarm.recurrence.toggleDay(d, today).let { r ->
+                        // Wird der Wecker dadurch einmalig, gilt eine alte Pause nicht mehr.
+                        saveAndAnnounce(context, alarm.copy(enabled = true, recurrence = r, pausedUntil = alarm.pausedUntil.takeIf { r.isRepeating }))
+                    }
                 }
                 Spacer(Modifier.size(4.dp))
                 DetailRow(Icons.Filled.Repeat, "Wiederholung", Format.describe(alarm.recurrence, today)) { editRecurrence = true }
@@ -367,7 +370,7 @@ private fun AlarmCard(
         }
     }
     if (editSound) {
-        SoundPickerDialog(alarm.ringtone, onDismiss = { editSound = false }) { sound ->
+        SoundPickerDialog(alarm.ringtone, alarm.ringtoneName, onDismiss = { editSound = false }) { sound ->
             editSound = false
             Alarms.save(context, alarm.copy(ringtone = sound.uri, ringtoneName = sound.uri?.let { sound.name }))
         }
@@ -411,7 +414,7 @@ private fun AlarmCard(
         )
     }
     if (editLabel) {
-        var text by remember { mutableStateOf(alarm.label) }
+        var text by rememberSaveable { mutableStateOf(alarm.label) }
         AlertDialog(
             onDismissRequest = { editLabel = false },
             title = { Text("Label") },

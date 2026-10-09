@@ -127,7 +127,7 @@ private class Preview(private val context: Context) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SoundPickerDialog(current: String?, onDismiss: () -> Unit, onConfirm: (Sound) -> Unit) {
+fun SoundPickerDialog(current: String?, currentName: String?, onDismiss: () -> Unit, onConfirm: (Sound) -> Unit) {
     val context = LocalContext.current
     val preview = remember { Preview(context) }
     DisposableEffect(Unit) { onDispose { preview.stop() } }
@@ -147,7 +147,8 @@ fun SoundPickerDialog(current: String?, onDismiss: () -> Unit, onConfirm: (Sound
         val all = loaded.flatMap { it.sounds }
         val match = all.firstOrNull { it.uri == current }
         if (match == null && current != null) {
-            custom = Sound(current, withContext(Dispatchers.IO) { fileName(context, Uri.parse(current)) })
+            // Der Name einer kopierten Datei ist nur noch am Wecker gespeichert, nicht an der Datei-URI.
+            custom = Sound(current, currentName ?: withContext(Dispatchers.IO) { fileName(context, Uri.parse(current)) })
         }
         selected = match ?: custom ?: all.first()
         sections = loaded

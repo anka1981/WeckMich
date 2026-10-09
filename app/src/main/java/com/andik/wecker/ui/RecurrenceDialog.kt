@@ -1,5 +1,7 @@
 package com.andik.wecker.ui
 
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -76,9 +78,9 @@ fun RecurrenceDialog(
     onDismiss: () -> Unit,
     onConfirm: (Recurrence) -> Unit,
 ) {
-    var r by remember { mutableStateOf(initial) }
-    var pickStart by remember { mutableStateOf(false) }
-    var pickEnd by remember { mutableStateOf(false) }
+    var r by rememberSaveable(stateSaver = RecurrenceSaver) { mutableStateOf(initial) }
+    var pickStart by rememberSaveable { mutableStateOf(false) }
+    var pickEnd by rememberSaveable { mutableStateOf(false) }
     val today = LocalDate.now()
 
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
@@ -292,3 +294,24 @@ private fun Hint(text: String) {
         modifier = Modifier.padding(vertical = 4.dp),
     )
 }
+
+/** Speichert eine [Recurrence] über Drehen und Prozess-Tod hinweg (als einfache Liste). */
+private val RecurrenceSaver = listSaver<Recurrence, Any?>(
+    save = { r ->
+        listOf(
+            r.type.name, r.interval, r.startDate?.toString(), r.endDate?.toString(),
+            r.weekdays.map { it.value }.joinToString(","), r.dayOfMonth, r.ordinals.joinToString(","),
+        )
+    },
+    restore = { l ->
+        Recurrence(
+            type = RepeatType.valueOf(l[0] as String),
+            interval = l[1] as Int,
+            startDate = (l[2] as String?)?.let(LocalDate::parse),
+            endDate = (l[3] as String?)?.let(LocalDate::parse),
+            weekdays = (l[4] as String).split(",").filter { it.isNotBlank() }.map { DayOfWeek.of(it.toInt()) }.toSet(),
+            dayOfMonth = l[5] as Int,
+            ordinals = (l[6] as String).split(",").filter { it.isNotBlank() }.map { it.toInt() }.toSet(),
+        )
+    },
+)

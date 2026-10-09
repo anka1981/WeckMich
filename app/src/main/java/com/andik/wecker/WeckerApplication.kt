@@ -12,6 +12,9 @@ class WeckerApplication : Application() {
         AlarmStore.init(this)
         AlarmService.createChannel(this)
         MissedNotifier.createChannel(this)
-        SoundFiles.cleanup(this, AlarmStore.alarms.value.map { it.ringtone })
+        // Nicht aufräumen, solange Wecker unlesbar sind – ihre eigenen Töne würden sonst gelöscht.
+        if (!AlarmStore.loadProblem && AlarmStore.unreadableIds.isEmpty()) {
+            SoundFiles.cleanup(this, AlarmStore.alarms.value.map { it.ringtone })
+        }
     }
 }

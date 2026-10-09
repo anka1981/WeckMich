@@ -92,14 +92,42 @@ class AlarmService : Service() {
                 val alarm = AlarmStore.get(id)
                     ?: if (intent.getBooleanExtra(EXTRA_UNKNOWN, false)) unknownAlarm(id) else null
                 // startForeground muss nach startForegroundService in jedem Fall folgen.
-                goForeground(alarm)
-                if (alarm == null) finishRinging() else ring(alarm)
+                // Klingelt schon ein anderer Wecker und dieser hier ist unbekannt (inzwischen gelöscht),
+                // bleibt die laufende Benachrichtigung stehen.
+                val current = RingingState.ringing.value
+                try {
+                    goForeground(alarm ?: current)
+                } catch (e: Exception) {
+                    // Darf der Dienst nicht in den Vordergrund (Hersteller, Neustart ohne Freigabe):
+                    // Notfall-Klingeln statt Stille.
+                    WakeBridge.release()
+                    alarm?.let { EmergencyAlarm.ring(this, it) }
+                    if (current == null) stopSelfResult(startId)
+                    return START_NOT_STICKY
+                }
+                val ringMillis = AlarmStore.settings.value.ringMinutes * 60_000L
+                val redelivered = flags and START_FLAG_REDELIVERY != 0
+                val elapsed = (System.currentTimeMillis() - intent.getLongExtra(EXTRA_FIRED_AT, System.currentTimeMillis()))
+                    .coerceAtLeast(0)
+                when {
+                    alarm == null -> if (current == null) finishRinging()
+                    // Neu zugestellt, nachdem das System den Prozess beendet hatte: nur die Restdauer
+                    // klingeln; war die Klingeldauer schon um, nur als verpasst melden.
+                    redelivered && ringMillis > 0 && elapsed >= ringMillis -> {
+                        if (!alarm.temporary) {
+                            MissedNotifier.notify(this, alarm, System.currentTimeMillis() - elapsed, "Klingeln wurde vom System unterbrochen")
+                        }
+                        if (current == null) finishRinging()
+                    }
+                    else -> ring(alarm, timeoutMillis = if (ringMillis > 0) ringMillis - (if (redelivered) elapsed else 0) else 0)
+                }
                 // Beendet das System den Prozess während des Klingelns, wird der Dienst mit demselben
                 // Intent neu gestartet und klingelt weiter, statt still zu verstummen.
                 return START_REDELIVER_INTENT
             }
             ACTION_SNOOZE -> {
-                (RingingState.ringing.value?.id ?: id.takeIf { it >= 0 })?.let { Alarms.snooze(this, it) }
+                val ringing = RingingState.ringing.value
+                (ringing?.id ?: id.takeIf { it >= 0 })?.let { Alarms.snooze(this, it, fallback = ringing) }
                 finishRinging(snoozed = true)
             }
             ACTION_DISMISS -> finishRinging()
@@ -116,7 +144,8 @@ class AlarmService : Service() {
         )
     }
 
-    private fun ring(alarm: Alarm) {
+    /** [timeoutMillis] > 0: verstummt danach von selbst (Restdauer nach einer Neuzustellung). */
+    private fun ring(alarm: Alarm, timeoutMillis: Long) {
         // Ein noch klingelnder anderer Wecker wird abgelöst – mit Hinweis, statt spurlos zu verschwinden.
         RingingState.ringing.value?.takeIf { it.id != alarm.id }?.let { previous ->
             if (previous.temporary) Alarms.delete(this, previous.id)
@@ -125,7 +154,7 @@ class AlarmService : Service() {
         stopPlayback()
         RingingState.current.value = alarm
         val settings = AlarmStore.settings.value
-        val wakeMillis = (if (settings.ringMinutes > 0) settings.ringMinutes else 60) * 60_000L + 60_000L
+        val wakeMillis = (if (timeoutMillis > 0) timeoutMillis else 60 * 60_000L) + 60_000L
         wakeLock = getSystemService(PowerManager::class.java)
             .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WeckMich:klingeln")
             .apply { acquire(wakeMillis) }
@@ -137,7 +166,7 @@ class AlarmService : Service() {
         // er hörbar wird (z. B. „verstummt nach 1 Min.“ mit „lauter werden in 5 Min.“).
         val maxRamp = if (settings.ringMinutes > 0) settings.ringMinutes * 30 else Int.MAX_VALUE
         startSound(alarm, AlarmStore.rampSecondsFor(alarm).coerceAtMost(maxRamp))
-        if (settings.ringMinutes > 0) handler.postDelayed(timeout, settings.ringMinutes * 60_000L)
+        if (timeoutMillis > 0) handler.postDelayed(timeout, timeoutMillis)
         // Vollbild-Aktivität zusätzlich direkt starten; klappt nur, wenn das System es gerade zulässt
         // (sonst übernimmt die Vollbild-Benachrichtigung bzw. die Heads-up-Benachrichtigung).
         runCatching { startActivity(ringingIntent(this, alarm.id)) }
@@ -224,7 +253,8 @@ class AlarmService : Service() {
         prepareTimeout = null
         handler.removeCallbacks(timeout)
         handler.removeCallbacks(ramp)
-        player?.runCatching { stop(); release() }
+        // Getrennt: stop() wirft im Zustand „Preparing“, release() muss trotzdem laufen.
+        player?.let { p -> runCatching { p.stop() }; p.release() }
         player = null
         vibrator?.cancel()
         vibrator = null
@@ -291,6 +321,7 @@ class AlarmService : Service() {
         const val ACTION_DISMISS = "com.andik.wecker.DISMISS"
         const val CHANNEL_ID = "klingeln"
         const val EXTRA_UNKNOWN = "unknownAlarm"
+        const val EXTRA_FIRED_AT = "firedAt"
         private const val PREPARE_TIMEOUT_MILLIS = 4_000L
         private val ALARM_AUDIO: AudioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_ALARM)

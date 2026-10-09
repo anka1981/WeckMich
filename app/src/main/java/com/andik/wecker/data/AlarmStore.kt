@@ -31,6 +31,7 @@ object AlarmStore {
         prefs = context.applicationContext.createDeviceProtectedStorageContext()
             .getSharedPreferences("wecker", Context.MODE_PRIVATE)
         val raw = prefs.getString("alarms", "[]") ?: "[]"
+        unreadableIds = prefs.getStringSet("unreadableIds", emptySet()).orEmpty().mapNotNull { it.toIntOrNull() }.toSet()
         val arr = runCatching { JSONArray(raw) }.getOrNull()
         // Fehlerhafte Daten werden gesichert und in der App gemeldet (siehe [loadProblem]); geplante
         // Auslösungen klingeln dann trotzdem (AlarmReceiver), statt still verworfen zu werden.
@@ -39,12 +40,25 @@ object AlarmStore {
             // Unlesbare Daten nicht beim nächsten Speichern stillschweigend überschreiben, sondern sichern.
             prefs.edit().putString("alarms_unlesbar_${System.currentTimeMillis()}", raw).commit()
         }
+        val lostIds = mutableSetOf<Int>()
         _alarms.value = arr?.let { a ->
-            // Einzelne kaputte Einträge überspringen statt alle Wecker zu verlieren.
+            // Einzelne kaputte Einträge überspringen statt alle Wecker zu verlieren – ihre IDs werden
+            // gemerkt, damit noch geplante Auslösungen weiter klingeln (siehe AlarmReceiver).
             (0 until a.length()).mapNotNull { i ->
-                runCatching { alarmFromJson(a.getJSONObject(i)) }.getOrNull().also { if (it == null) loadProblem = true }
+                runCatching { alarmFromJson(a.getJSONObject(i)) }.getOrNull().also {
+                    if (it == null) {
+                        loadProblem = true
+                        runCatching { a.getJSONObject(i).optInt("id", -1) }.getOrNull()?.takeIf { id -> id >= 0 }?.let(lostIds::add)
+                    }
+                }
             }
         } ?: emptyList()
+        if (loadProblem) {
+            if (arr != null) prefs.edit().putString("alarms_unlesbar_${System.currentTimeMillis()}", raw).commit()
+            unreadableIds = unreadableIds + lostIds
+            prefs.edit().putStringSet("unreadableIds", unreadableIds.map { it.toString() }.toSet()).commit()
+        }
+        maxIdEver = maxOf(prefs.getInt("maxIdEver", 0), _alarms.value.maxOfOrNull { it.id } ?: 0, unreadableIds.maxOrNull() ?: 0)
         _settings.value = Settings(
             snoozeMinutes = prefs.getInt("snoozeMinutes", 10),
             ringMinutes = prefs.getInt("ringMinutes", 10),
@@ -56,13 +70,25 @@ object AlarmStore {
     @Volatile var loadProblem = false
         private set
 
+    /** IDs von Weckern, die beim Laden unlesbar waren (dauerhaft gemerkt). */
+    @Volatile var unreadableIds: Set<Int> = emptySet()
+        private set
+
+    /** Höchste je vergebene ID – neue Wecker bekommen nie die ID eines alten, noch geplanten. */
+    private var maxIdEver = 0
+
     /** Letzter Schreibversuch fehlgeschlagen (z. B. Speicher voll) – die App zeigt einen Hinweis. */
     private val _writeFailed = MutableStateFlow(false)
     val writeFailed: StateFlow<Boolean> = _writeFailed.asStateFlow()
 
     fun get(id: Int): Alarm? = _alarms.value.firstOrNull { it.id == id }
 
-    fun nextId(): Int = (_alarms.value.maxOfOrNull { it.id } ?: 0) + 1
+    @Synchronized
+    fun nextId(): Int {
+        maxIdEver = maxOf(maxIdEver, _alarms.value.maxOfOrNull { it.id } ?: 0) + 1
+        prefs.edit().putInt("maxIdEver", maxIdEver).commit()
+        return maxIdEver
+    }
 
     @Synchronized
     fun upsert(alarm: Alarm) {
@@ -119,6 +145,7 @@ object AlarmStore {
         put("lastPauseAmount", a.lastPauseAmount)
         put("lastPauseUnit", a.lastPauseUnit.name)
         put("lastRung", a.lastRung?.toString())
+        put("lastRungZone", a.lastRungZone)
         val r = a.recurrence
         put("recurrence", JSONObject().apply {
             put("type", r.type.name)
@@ -152,6 +179,7 @@ object AlarmStore {
             pausedUntil = o.stringOrNull("pausedUntil")?.let(LocalDate::parse),
             lastPauseAmount = o.optInt("lastPauseAmount", 2),
             lastRung = o.stringOrNull("lastRung")?.let(java.time.LocalDateTime::parse),
+            lastRungZone = o.stringOrNull("lastRungZone"),
             lastPauseUnit = runCatching { PauseUnit.valueOf(o.optString("lastPauseUnit")) }.getOrDefault(PauseUnit.WEEKS),
             snoozeUntil = if (o.has("snoozeUntil") && !o.isNull("snoozeUntil")) o.getLong("snoozeUntil") else null,
             recurrence = Recurrence(

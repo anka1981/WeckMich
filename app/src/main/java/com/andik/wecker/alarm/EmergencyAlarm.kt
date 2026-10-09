@@ -17,7 +17,9 @@ import androidx.core.content.ContextCompat
 import com.andik.wecker.R
 import com.andik.wecker.model.Alarm
 import com.andik.wecker.model.Format
-import com.andik.wecker.ui.MainActivity
+import android.content.BroadcastReceiver
+import com.andik.wecker.data.AlarmStore
+import com.andik.wecker.ui.RingingActivity
 
 /**
  * Notfall-Klingeln, wenn der Klingeldienst nicht starten darf (z. B. Akku-Modus „Eingeschränkt“,
@@ -52,15 +54,30 @@ object EmergencyAlarm {
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) return
         createChannel(context)
+        val notificationId = NOTIFICATION_BASE + alarm.id
+        // Vollbild/Antippen: der Klingelbildschirm (über der Sperre, auch vor dem ersten Entsperren)
+        // im Notfall-Modus – sein „Beenden“ entfernt diese Benachrichtigung.
         val open = PendingIntent.getActivity(
-            context, NOTIFICATION_BASE + alarm.id, Intent(context, MainActivity::class.java),
+            context, notificationId,
+            Intent(context, RingingActivity::class.java)
+                .putExtra(RingingActivity.EXTRA_EMERGENCY_NOTIFICATION, notificationId)
+                .putExtra(RingingActivity.EXTRA_EMERGENCY_LABEL, alarm.label)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
+        val stop = PendingIntent.getBroadcast(
+            context, notificationId,
+            Intent(context, EmergencyStopReceiver::class.java).putExtra(EmergencyStopReceiver.EXTRA_ID, notificationId),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+        val ringMinutes = AlarmStore.settings.value.ringMinutes
         val title = alarm.label.ifBlank { "Wecker" } + " – " + Format.time(alarm.hour, alarm.minute)
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_alarm)
             .setContentTitle(title)
-            .setContentText("Der normale Weckton konnte nicht starten. Antippen zum Beenden.")
+            .setContentText("Der normale Weckton konnte nicht starten.")
+            .addAction(0, "Beenden", stop)
+            .apply { if (ringMinutes > 0) setTimeoutAfter(ringMinutes * 60_000L) }
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -69,6 +86,18 @@ object EmergencyAlarm {
             .setAutoCancel(true)
             .build()
         notification.flags = notification.flags or Notification.FLAG_INSISTENT
-        runCatching { NotificationManagerCompat.from(context).notify(NOTIFICATION_BASE + alarm.id, notification) }
+        runCatching { NotificationManagerCompat.from(context).notify(notificationId, notification) }
+    }
+}
+
+/** „Beenden“ in der Notfall-Benachrichtigung – funktioniert auch auf dem Sperrbildschirm. */
+class EmergencyStopReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        val id = intent.getIntExtra(EXTRA_ID, -1)
+        if (id >= 0) NotificationManagerCompat.from(context).cancel(id)
+    }
+
+    companion object {
+        const val EXTRA_ID = "notificationId"
     }
 }

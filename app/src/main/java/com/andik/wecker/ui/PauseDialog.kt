@@ -40,7 +40,8 @@ fun pauseText(alarm: Alarm, today: LocalDate): String? =
 private fun skippedText(skipped: List<LocalDateTime>, today: LocalDate): String {
     if (skipped.isEmpty()) return "Es entfällt kein Termin."
     val shown = skipped.take(4).joinToString(" · ") { day(it.toLocalDate(), today) }
-    val more = if (skipped.size > 4) " und ${skipped.size - 4} weitere" else ""
+    val rest = skipped.size - 4
+    val more = when { rest <= 0 -> ""; rest == 1 -> " und 1 weiterer"; else -> " und $rest weitere" }
     return if (skipped.size == 1) "Es entfällt 1 Termin: $shown" else "Es entfallen ${skipped.size} Termine: $shown$more"
 }
 
@@ -64,20 +65,26 @@ fun PauseDialog(
     // Startet mit der zuletzt für diesen Wecker gewählten Dauer.
     var amount by rememberSaveable { mutableIntStateOf(alarm.lastPauseAmount) }
     var unit by rememberSaveable { mutableStateOf(alarm.lastPauseUnit) }
-    var pickDate by remember { mutableStateOf(false) }
+    var pickDate by rememberSaveable { mutableStateOf(false) }
 
     // Gezählt wird ab heute, wie man „2 Wochen Pause“ versteht. Damit klar ist, was das bewirkt
     // (z. B. abends nach der Weckzeit: „1 Tag“ lässt nichts ausfallen), listet der Dialog die
     // ausfallenden Termine auf.
+    // Wie nach dem Bestätigen: Aussetzen schaltet den Wecker ein – die Vorschau rechnet entsprechend.
+    val armed = remember(alarm) { alarm.copy(enabled = true, snoozeUntil = null) }
+    // „Termine“ höchstens so viele, wie es noch gibt (z. B. bei einem Enddatum).
+    val remainingCount = remember(armed) { armed.copy(pausedUntil = null).occurrencesSkippedBy(java.time.LocalDate.MAX, LocalDateTime.now(), limit = PauseUnit.OCCURRENCES.max).size }
+    val maxAmount = if (unit == PauseUnit.OCCURRENCES) remainingCount.coerceAtLeast(1) else unit.max
+    if (amount > maxAmount) amount = maxAmount
     val resume = remember(alarm, unit, amount) {
-        if (unit == PauseUnit.OCCURRENCES) alarm.resumeAfterSkipping(amount, LocalDateTime.now())
+        if (unit == PauseUnit.OCCURRENCES) armed.resumeAfterSkipping(amount, LocalDateTime.now())
         else unit.plus(today, amount)
     }
-    val skipped = remember(alarm, resume) { alarm.occurrencesSkippedBy(resume, LocalDateTime.now()) }
+    val skipped = remember(alarm, resume) { armed.occurrencesSkippedBy(resume, LocalDateTime.now()) }
     val next = remember(alarm, resume) {
-        alarm.copy(pausedUntil = resume, snoozeUntil = null).nextRegularOccurrence(LocalDateTime.now())
+        armed.copy(pausedUntil = resume).nextRegularOccurrence(LocalDateTime.now())
     }
-    val currentNext = remember(alarm) { alarm.copy(snoozeUntil = null).nextRegularOccurrence(LocalDateTime.now()) }
+    val currentNext = remember(armed) { armed.nextRegularOccurrence(LocalDateTime.now()) }
     val paused = alarm.isPaused(today)
 
     AlertDialog(
@@ -98,12 +105,12 @@ fun PauseDialog(
                         .replaceFirstChar { it.uppercase() },
                     style = MaterialTheme.typography.titleSmall,
                 )
-                Stepper(amount, 1..unit.max, "$amount") { amount = it }
+                Stepper(amount, 1..maxAmount, "$amount", what = "Anzahl") { amount = it }
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     PauseUnit.entries.forEach { u ->
                         FilterChip(
                             selected = u == unit,
-                            onClick = { unit = u; amount = amount.coerceAtMost(u.max) },
+                            onClick = { unit = u },
                             label = { Text(if (amount == 1) u.one else u.many) },
                         )
                     }

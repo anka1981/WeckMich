@@ -21,7 +21,7 @@ object Alarms {
     /** Nächster Klingelzeitpunkt (Wiederholungsregel oder Schlummern, was früher ist) in Epoch-Millis. */
     fun nextFireMillis(a: Alarm, now: Long = System.currentTimeMillis()): Long? {
         // Zeitumstellungs-sicher und nie für den zuletzt geklungenen Termin (siehe nextRegularInstant).
-        val regular = a.nextRegularInstant(Instant.ofEpochMilli(now), ZoneId.systemDefault(), a.lastRung)
+        val regular = a.nextRegularInstant(Instant.ofEpochMilli(now), ZoneId.systemDefault(), a.lastRung, a.lastRungZone)
             ?.toEpochMilli()
         val snooze = a.snoozeUntil?.takeIf { it > now }
         return listOfNotNull(regular, snooze).minOrNull()
@@ -63,8 +63,10 @@ object Alarms {
         updated.forEach { arm(context, it.id, it.scheduledAt) }
     }
 
-    fun snooze(context: Context, id: Int) {
-        val a = AlarmStore.get(id) ?: return
+    fun snooze(context: Context, id: Int, fallback: Alarm? = null) {
+        // Unbekannter Wecker (beschädigte Daten): als Probewecker anlegen, damit Schlummern wirklich
+        // wiederkommt, statt das Klingeln still zu beenden.
+        val a = AlarmStore.get(id) ?: fallback?.copy(id = AlarmStore.nextId(), enabled = false, temporary = true) ?: return
         val minutes = AlarmStore.snoozeMinutesFor(a)
         save(context, a.copy(snoozeUntil = System.currentTimeMillis() + minutes * 60_000L))
     }
@@ -79,7 +81,11 @@ object Alarms {
         // Schlummern ist fällig, sobald seine Zeit (fast) erreicht ist – ohne Obergrenze: eine verspätete
         // Zustellung klingelt trotzdem, statt als "veraltet" verworfen zu werden.
         val isSnooze = a.snoozeUntil != null && now >= a.snoozeUntil - EARLY_TOLERANCE_MILLIS
-        if (!isSnooze && !a.enabled) {
+        // Veraltete oder doppelte Auslösung: Der geplante Termin liegt noch in der Zukunft (z. B. die
+        // erste von zwei Zustellungen nach einem Neustart hat den Wecker schon weitergeplant). Nicht
+        // klingeln – sonst klingelte er zweimal und markierte den nächsten Termin als „geklungen“.
+        val notDueYet = a.scheduledAt != null && a.scheduledAt > now + EARLY_TOLERANCE_MILLIS
+        if (!isSnooze && (!a.enabled || notDueYet)) {
             save(context, a)
             return null
         }
@@ -89,11 +95,12 @@ object Alarms {
             else -> {
                 // Den geklungenen Termin merken: er wird nie erneut geplant (Zeitumstellung, zu frühe
                 // Zustellung, Uhr zurückgestellt).
-                val rung = LocalDateTime.ofInstant(Instant.ofEpochMilli(a.scheduledAt ?: now), zone)
-                    .truncatedTo(ChronoUnit.MINUTES)
+                val rungAt = minOf(a.scheduledAt ?: now, now)
+                val rung = LocalDateTime.ofInstant(Instant.ofEpochMilli(rungAt), zone).truncatedTo(ChronoUnit.MINUTES)
                 a.copy(
                     snoozeUntil = null,
                     lastRung = rung,
+                    lastRungZone = zone.id,
                     enabled = a.enabled && a.recurrence.type != RepeatType.ONCE,
                 )
             }

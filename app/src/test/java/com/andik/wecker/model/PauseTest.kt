@@ -112,4 +112,17 @@ class DstTest {
         val next = daily0230.nextRegularInstant(now, berlin)!!
         org.junit.Assert.assertEquals(java.time.Instant.parse("2027-03-28T01:30:00Z"), next) // 03:30 MESZ
     }
+
+    @Test fun `lastRung far in the future is ignored after the clock went back`() {
+        // Uhr/Zone um einen Tag zurück: lastRung (morgen 02:30) darf heutige Termine nicht verschlucken.
+        val now = java.time.Instant.parse("2026-10-27T12:00:00Z")
+        val next = daily0230.nextRegularInstant(now, berlin, lastRung = LocalDateTime.of(2026, 10, 29, 2, 30))!!
+        org.junit.Assert.assertEquals(java.time.Instant.parse("2026-10-28T01:30:00Z"), next)
+    }
+
+    @Test fun `lastRung from another zone is ignored`() {
+        val now = java.time.Instant.parse("2026-10-25T01:10:00Z")
+        val next = daily0230.nextRegularInstant(now, berlin, lastRung = LocalDateTime.of(2026, 10, 25, 2, 30), lastRungZone = "America/New_York")!!
+        org.junit.Assert.assertEquals(java.time.Instant.parse("2026-10-25T01:30:00Z"), next)
+    }
 }

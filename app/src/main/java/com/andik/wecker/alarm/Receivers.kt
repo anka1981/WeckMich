@@ -17,7 +17,7 @@ class AlarmReceiver : BroadcastReceiver() {
         // Waren die gespeicherten Wecker unlesbar, ist eine Auslösung mit unbekannter ID trotzdem ein
         // gestellter Wecker – lieber mit Standardton klingeln als still bleiben. (Gelöschte Wecker
         // werden beim Löschen beim AlarmManager abgemeldet und kommen hier nicht an.)
-        val unknown = known == null && AlarmStore.loadProblem && AlarmStore.get(id) == null
+        val unknown = known == null && AlarmStore.get(id) == null && (AlarmStore.loadProblem || id in AlarmStore.unreadableIds)
         if (known == null && !unknown) {
             WakeBridge.release()
             return
@@ -28,7 +28,8 @@ class AlarmReceiver : BroadcastReceiver() {
                 Intent(context, AlarmService::class.java)
                     .setAction(AlarmService.ACTION_RING)
                     .putExtra(Alarms.EXTRA_ID, id)
-                    .putExtra(AlarmService.EXTRA_UNKNOWN, unknown),
+                    .putExtra(AlarmService.EXTRA_UNKNOWN, unknown)
+                    .putExtra(AlarmService.EXTRA_FIRED_AT, System.currentTimeMillis()),
             )
         } catch (e: Exception) {
             // Dienststart verweigert (Akku „Eingeschränkt“, Herstellerbeschränkung …): Notfall-Klingeln.
