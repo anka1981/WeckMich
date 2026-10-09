@@ -100,6 +100,7 @@ object AlarmStore {
         put("snoozeUntil", a.snoozeUntil)
         put("temporary", a.temporary)
         put("scheduledAt", a.scheduledAt)
+        put("pausedUntil", a.pausedUntil?.toString())
         val r = a.recurrence
         put("recurrence", JSONObject().apply {
             put("type", r.type.name)
@@ -130,6 +131,7 @@ object AlarmStore {
             vibrate = o.optBoolean("vibrate", true),
             temporary = o.optBoolean("temporary", false),
             scheduledAt = if (o.has("scheduledAt") && !o.isNull("scheduledAt")) o.getLong("scheduledAt") else null,
+            pausedUntil = o.stringOrNull("pausedUntil")?.let(LocalDate::parse),
             snoozeUntil = if (o.has("snoozeUntil") && !o.isNull("snoozeUntil")) o.getLong("snoozeUntil") else null,
             recurrence = Recurrence(
                 type = runCatching { RepeatType.valueOf(r.optString("type")) }.getOrDefault(RepeatType.ONCE),

@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.PauseCircle
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Snooze
@@ -234,6 +235,7 @@ private fun AlarmCard(
     var editSound by remember { mutableStateOf(false) }
     var editSnooze by remember { mutableStateOf(false) }
     var editRamp by remember { mutableStateOf(false) }
+    var editPause by remember { mutableStateOf(false) }
     val defaults by AlarmStore.settings.collectAsState()
 
     Card(
@@ -261,6 +263,9 @@ private fun AlarmCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(Format.describe(alarm.recurrence, today), style = MaterialTheme.typography.bodyMedium)
+                    pauseText(alarm, today)?.let {
+                        Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
+                    }
                     NextLine(alarm, now)
                 }
                 Icon(if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, if (expanded) "Zuklappen" else "Aufklappen")
@@ -273,6 +278,11 @@ private fun AlarmCard(
                 }
                 Spacer(Modifier.size(4.dp))
                 DetailRow(Icons.Filled.Repeat, "Wiederholung", Format.describe(alarm.recurrence, today)) { editRecurrence = true }
+                if (alarm.recurrence.isRepeating) {
+                    DetailRow(Icons.Filled.PauseCircle, "Aussetzen", pauseText(alarm, today) ?: "Für Tage, Wochen oder Monate pausieren") {
+                        editPause = true
+                    }
+                }
                 DetailRow(Icons.AutoMirrored.Filled.Label, "Label", alarm.label.ifBlank { "Hinzufügen" }) { editLabel = true }
                 DetailRow(Icons.Filled.MusicNote, "Weckton", alarm.ringtoneName ?: "Standard-Weckton") { editSound = true }
                 DetailRow(
@@ -311,7 +321,8 @@ private fun AlarmCard(
     if (editRecurrence) {
         RecurrenceDialog(alarm.recurrence, alarm.time, onDismiss = { editRecurrence = false }) {
             editRecurrence = false
-            saveAndAnnounce(context, alarm.copy(recurrence = it, enabled = true))
+            // Eine Pause gilt nur für wiederholende Wecker.
+            saveAndAnnounce(context, alarm.copy(recurrence = it, enabled = true, pausedUntil = alarm.pausedUntil.takeIf { _ -> it.isRepeating }))
         }
     }
     if (editSound) {
@@ -337,6 +348,20 @@ private fun AlarmCard(
             label = { v -> v?.let(Format::ramp) ?: "Standard (${Format.ramp(defaults.rampSeconds)})" },
             onDismiss = { editRamp = false },
         ) { Alarms.save(context, alarm.copy(rampSeconds = it)) }
+    }
+    if (editPause) {
+        PauseDialog(
+            alarm = alarm,
+            onDismiss = { editPause = false },
+            onPause = { resume ->
+                editPause = false
+                saveAndAnnounce(context, alarm.copy(pausedUntil = resume, enabled = true, snoozeUntil = null))
+            },
+            onResume = {
+                editPause = false
+                saveAndAnnounce(context, alarm.copy(pausedUntil = null))
+            },
+        )
     }
     if (editLabel) {
         var text by remember { mutableStateOf(alarm.label) }

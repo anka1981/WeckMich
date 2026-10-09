@@ -21,10 +21,8 @@ object Alarms {
     /** Nächster Klingelzeitpunkt (Wiederholungsregel oder Schlummern, was früher ist) in Epoch-Millis. */
     fun nextFireMillis(a: Alarm, now: Long = System.currentTimeMillis()): Long? {
         val zone = ZoneId.systemDefault()
-        val regular = if (a.enabled) {
-            a.recurrence.nextOccurrence(a.time, LocalDateTime.ofInstant(Instant.ofEpochMilli(now), zone))
-                ?.atZone(zone)?.toInstant()?.toEpochMilli()
-        } else null
+        val regular = a.nextRegularOccurrence(LocalDateTime.ofInstant(Instant.ofEpochMilli(now), zone))
+            ?.atZone(zone)?.toInstant()?.toEpochMilli()
         val snooze = a.snoozeUntil?.takeIf { it > now }
         return listOfNotNull(regular, snooze).minOrNull()
     }

@@ -1,5 +1,7 @@
 package com.andik.wecker.model
 
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 data class Alarm(
@@ -24,8 +26,25 @@ data class Alarm(
     val temporary: Boolean = false,
     /** Zuletzt beim System geplanter Klingelzeitpunkt (Epoch-Millis), um verpasste Wecker zu erkennen. */
     val scheduledAt: Long? = null,
+    /** Ausgesetzt: erster Tag, an dem der Wecker wieder klingeln darf; `null` = nicht pausiert.
+     * Nur für wiederholende Wecker – Termine davor werden übersprungen. */
+    val pausedUntil: LocalDate? = null,
 ) {
     val time: LocalTime get() = LocalTime.of(hour, minute)
+
+    /** Pausiert am Tag [today]? (Eine abgelaufene Pause zählt nicht mehr.) */
+    fun isPaused(today: LocalDate): Boolean =
+        recurrence.isRepeating && pausedUntil != null && pausedUntil.isAfter(today)
+
+    /** Nächster regulärer Termin nach [now] – ohne Schlummern, mit Berücksichtigung einer Pause. */
+    fun nextRegularOccurrence(now: LocalDateTime): LocalDateTime? {
+        if (!enabled) return null
+        val resume = pausedUntil?.takeIf { isPaused(now.toLocalDate()) }?.atStartOfDay()
+        // nextOccurrence liefert Termine echt nach "after" – eine Sekunde vor Mitternacht des
+        // Wiederbeginn-Tags lässt auch einen Wecker um 00:00 an diesem Tag zu.
+        val after = if (resume != null && resume.isAfter(now)) resume.minusSeconds(1) else now
+        return recurrence.nextOccurrence(time, after)
+    }
 
     /**
      * Zustand nach einem verpassten Klingeln (Gerät war aus): `this`, wenn nichts verpasst wurde,
