@@ -72,6 +72,7 @@ fun Recurrence.withType(type: RepeatType, today: LocalDate = LocalDate.now()): R
 fun RecurrenceDialog(
     initial: Recurrence,
     time: LocalTime,
+    pausedUntil: LocalDate? = null,
     onDismiss: () -> Unit,
     onConfirm: (Recurrence) -> Unit,
 ) {
@@ -215,7 +216,12 @@ fun RecurrenceDialog(
                 HorizontalDivider(Modifier.padding(vertical = 8.dp))
                 Column(section) {
                     SectionTitle("Nächste Termine")
-                    val upcoming = remember(r, time) { r.nextOccurrences(time, LocalDateTime.now(), 8) }
+                    // Wie die Planung: Termine während einer Pause fallen aus.
+                    val upcoming = remember(r, time, pausedUntil) {
+                        val now = LocalDateTime.now()
+                        val resume = pausedUntil?.takeIf { r.isRepeating && it.isAfter(now.toLocalDate()) }?.atStartOfDay()?.minusSeconds(1)
+                        r.nextOccurrences(time, if (resume != null && resume.isAfter(now)) resume else now, 8)
+                    }
                     if (upcoming.isEmpty()) {
                         Text("Keine weiteren Termine", color = MaterialTheme.colorScheme.error)
                     }
@@ -233,13 +239,19 @@ fun RecurrenceDialog(
     if (pickStart) {
         DatePickDialog(r.startDate ?: today, onDismiss = { pickStart = false }) {
             pickStart = false
-            r = r.copy(startDate = it, endDate = r.endDate?.takeIf { e -> !e.isBefore(it) })
+            // Ein Enddatum vor dem neuen Start wird auf den Start gezogen – früher wurde es still zu
+            // „Nie“, und der Wecker hätte unbegrenzt weitergeklingelt.
+            r = r.copy(startDate = it, endDate = r.endDate?.let { e -> if (e.isBefore(it)) it else e })
         }
     }
     if (pickEnd) {
-        DatePickDialog(r.endDate ?: (r.startDate ?: today).plusMonths(3), onDismiss = { pickEnd = false }) {
+        DatePickDialog(
+            r.endDate ?: (r.startDate ?: today).plusMonths(3),
+            onDismiss = { pickEnd = false },
+            minDate = r.startDate ?: today,
+        ) {
             pickEnd = false
-            r = r.copy(endDate = it.takeIf { e -> !e.isBefore(r.startDate ?: today) })
+            r = r.copy(endDate = it)
         }
     }
 }

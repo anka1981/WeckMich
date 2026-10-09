@@ -1,5 +1,11 @@
 package com.andik.wecker.ui
 
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.selection.toggleable
+import com.andik.wecker.alarm.RingingState
+import com.andik.wecker.alarm.AlarmService
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
@@ -106,10 +112,22 @@ fun Recurrence.toggleDay(d: DayOfWeek, today: LocalDate = LocalDate.now()): Recu
             else -> this
         }
     }
+    // Beim Umwandeln in „wöchentlich“ bleiben Start und Ende erhalten – vorher ging ein Enddatum
+    // durch einen Tipp auf einen Wochentag still verloren.
     RepeatType.DAILY ->
-        if (interval == 1) Recurrence(RepeatType.WEEKLY, startDate = today, weekdays = DayOfWeek.entries.toSet() - d)
-        else Recurrence(RepeatType.WEEKLY, startDate = today, weekdays = setOf(d))
-    else -> Recurrence(RepeatType.WEEKLY, startDate = today, weekdays = setOf(d))
+        if (interval == 1) Recurrence(RepeatType.WEEKLY, startDate = startDate ?: today, weekdays = DayOfWeek.entries.toSet() - d, endDate = endDate)
+        else Recurrence(RepeatType.WEEKLY, startDate = startDate ?: today, weekdays = setOf(d), endDate = endDate)
+    RepeatType.ONCE -> Recurrence(RepeatType.WEEKLY, startDate = today, weekdays = setOf(d))
+    else -> Recurrence(RepeatType.WEEKLY, startDate = startDate ?: today, weekdays = setOf(d), endDate = endDate)
+}
+
+/** Ein einmaliger Wecker mit festem, schon vergangenem Datum würde beim Wiedereinschalten nie
+ * klingeln – das Datum wird dann verworfen (nächstes Vorkommen der Uhrzeit, wie bei der Android-Uhr). */
+fun Alarm.rearmed(): Alarm {
+    val r = recurrence
+    val stale = r.type == RepeatType.ONCE && r.startDate != null &&
+        r.nextOccurrence(time, java.time.LocalDateTime.now()) == null
+    return if (stale) copy(recurrence = r.copy(startDate = null)) else this
 }
 
 fun Recurrence.selectedDays(): Set<DayOfWeek> = when (type) {
@@ -126,9 +144,12 @@ fun AlarmListScreen(onOpenSettings: () -> Unit) {
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var issues by remember { mutableStateOf(emptyList<Issue>()) }
     var expandedId by rememberSaveable { mutableIntStateOf(-1) }
-    var createNew by remember { mutableStateOf(false) }
+    var createNew by rememberSaveable { mutableStateOf(false) }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { issues = Reliability.issues(context) }
+    val writeFailed by AlarmStore.writeFailed.collectAsState()
+    LaunchedEffect(writeFailed) { issues = Reliability.issues(context) }
+    val ringing by RingingState.ringing.collectAsState()
     // „in X Std.“ nur aktualisieren, solange die App sichtbar ist – und dann genau zum Minutenwechsel.
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(lifecycle) {
@@ -158,6 +179,9 @@ fun AlarmListScreen(onOpenSettings: () -> Unit) {
             contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            // Klingelt gerade ein Wecker, lässt er sich hier immer beenden – auch wenn Benachrichtigungen
+            // oder die Vollbildanzeige fehlen und sonst kein Knopf erreichbar wäre.
+            ringing?.let { r -> item(key = "ringing") { RingingBanner(r) } }
             items(issues.filter { it.critical }, key = { "issue-" + it.title }) { IssueCard(it) }
             if (alarms.isEmpty()) {
                 item {
@@ -188,6 +212,21 @@ fun AlarmListScreen(onOpenSettings: () -> Unit) {
             val alarm = Alarm(id = AlarmStore.nextId(), hour = h, minute = m)
             saveAndAnnounce(context, alarm)
             expandedId = alarm.id
+        }
+    }
+}
+
+@Composable
+private fun RingingBanner(alarm: Alarm) {
+    val context = LocalContext.current
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+        Row(Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                "Klingelt: ${alarm.label.ifBlank { "Wecker" }} ${Format.time(alarm.hour, alarm.minute)}",
+                Modifier.weight(1f), fontWeight = FontWeight.SemiBold,
+            )
+            TextButton(onClick = { AlarmService.send(context, AlarmService.ACTION_SNOOZE) }) { Text("Schlummern") }
+            TextButton(onClick = { AlarmService.send(context, AlarmService.ACTION_DISMISS) }) { Text("Beenden") }
         }
     }
 }
@@ -226,16 +265,16 @@ private fun AlarmCard(
     onDelete: () -> Unit,
 ) {
     val context = LocalContext.current
-    var editTime by remember { mutableStateOf(false) }
-    var editRecurrence by remember { mutableStateOf(false) }
-    var editLabel by remember { mutableStateOf(false) }
+    var editTime by rememberSaveable { mutableStateOf(false) }
+    var editRecurrence by rememberSaveable { mutableStateOf(false) }
+    var editLabel by rememberSaveable { mutableStateOf(false) }
     val active = alarm.enabled || alarm.snoozeUntil?.let { it > now } == true
     val today = LocalDate.now()
 
-    var editSound by remember { mutableStateOf(false) }
-    var editSnooze by remember { mutableStateOf(false) }
-    var editRamp by remember { mutableStateOf(false) }
-    var editPause by remember { mutableStateOf(false) }
+    var editSound by rememberSaveable { mutableStateOf(false) }
+    var editSnooze by rememberSaveable { mutableStateOf(false) }
+    var editRamp by rememberSaveable { mutableStateOf(false) }
+    var editPause by rememberSaveable { mutableStateOf(false) }
     val defaults by AlarmStore.settings.collectAsState()
 
     Card(
@@ -256,8 +295,10 @@ private fun AlarmCard(
                     modifier = Modifier.clickable { editTime = true },
                 )
                 Spacer(Modifier.weight(1f))
-                Switch(checked = alarm.enabled, onCheckedChange = {
-                    saveAndAnnounce(context, alarm.copy(enabled = it, snoozeUntil = null, temporary = false))
+                Switch(
+                    modifier = Modifier.semantics { contentDescription = "Wecker ${Format.time(alarm.hour, alarm.minute)} ein" },
+                    checked = alarm.enabled, onCheckedChange = {
+                    saveAndAnnounce(context, alarm.copy(enabled = it, snoozeUntil = null, temporary = false).let { a -> if (it) a.rearmed() else a })
                 })
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -315,11 +356,11 @@ private fun AlarmCard(
     if (editTime) {
         TimePickDialog(alarm.hour, alarm.minute, onDismiss = { editTime = false }) { h, m ->
             editTime = false
-            saveAndAnnounce(context, alarm.copy(hour = h, minute = m, enabled = true, snoozeUntil = null))
+            saveAndAnnounce(context, alarm.copy(hour = h, minute = m, enabled = true, snoozeUntil = null).rearmed())
         }
     }
     if (editRecurrence) {
-        RecurrenceDialog(alarm.recurrence, alarm.time, onDismiss = { editRecurrence = false }) {
+        RecurrenceDialog(alarm.recurrence, alarm.time, alarm.pausedUntil, onDismiss = { editRecurrence = false }) {
             editRecurrence = false
             // Eine Pause gilt nur für wiederholende Wecker.
             saveAndAnnounce(context, alarm.copy(recurrence = it, enabled = true, pausedUntil = alarm.pausedUntil.takeIf { _ -> it.isRepeating }))
@@ -353,9 +394,15 @@ private fun AlarmCard(
         PauseDialog(
             alarm = alarm,
             onDismiss = { editPause = false },
-            onPause = { resume ->
+            onPause = { resume, amount, unit ->
                 editPause = false
-                saveAndAnnounce(context, alarm.copy(pausedUntil = resume, enabled = true, snoozeUntil = null))
+                saveAndAnnounce(
+                    context,
+                    alarm.copy(
+                        pausedUntil = resume, enabled = true, snoozeUntil = null,
+                        lastPauseAmount = amount, lastPauseUnit = unit,
+                    ),
+                )
             },
             onResume = {
                 editPause = false
@@ -408,7 +455,9 @@ private fun DayCircles(selected: Set<DayOfWeek>, onToggle: (DayOfWeek) -> Unit) 
                 shape = CircleShape,
                 color = if (on) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHighest,
                 contentColor = if (on) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.size(38.dp).clip(CircleShape).clickable { onToggle(d) },
+                modifier = Modifier.size(38.dp).clip(CircleShape)
+                    .toggleable(value = on, role = Role.Checkbox) { onToggle(d) }
+                    .semantics { contentDescription = Format.longDay(d) },
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(Format.shortDay(d), style = MaterialTheme.typography.labelLarge)

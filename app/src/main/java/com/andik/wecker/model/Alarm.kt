@@ -1,8 +1,10 @@
 package com.andik.wecker.model
 
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 
 data class Alarm(
     val id: Int,
@@ -29,12 +31,69 @@ data class Alarm(
     /** Ausgesetzt: erster Tag, an dem der Wecker wieder klingeln darf; `null` = nicht pausiert.
      * Nur für wiederholende Wecker – Termine davor werden übersprungen. */
     val pausedUntil: LocalDate? = null,
+    /** Zuletzt im Aussetzen-Dialog gewählte Dauer – der Dialog startet beim nächsten Mal damit. */
+    val lastPauseAmount: Int = 2,
+    val lastPauseUnit: PauseUnit = PauseUnit.WEEKS,
+    /** Ortszeit des zuletzt geklungenen regulären Termins – wird nie erneut geplant. */
+    val lastRung: LocalDateTime? = null,
 ) {
     val time: LocalTime get() = LocalTime.of(hour, minute)
 
     /** Pausiert am Tag [today]? (Eine abgelaufene Pause zählt nicht mehr.) */
     fun isPaused(today: LocalDate): Boolean =
         recurrence.isRepeating && pausedUntil != null && pausedUntil.isAfter(today)
+
+    /** Erster Tag nach dem [count]-ten kommenden Termin – eine Pause bis dahin lässt genau die
+     * nächsten [count] Termine ausfallen. Gibt es weniger Termine, ab dem Tag nach dem letzten. */
+    fun resumeAfterSkipping(count: Int, now: LocalDateTime): LocalDate {
+        var from = now
+        var last: LocalDateTime? = null
+        repeat(count) {
+            val next = recurrence.nextOccurrence(time, from) ?: return@repeat
+            last = next
+            from = next
+        }
+        return (last?.toLocalDate() ?: now.toLocalDate()).plusDays(1)
+    }
+
+    /** Termine der Regel nach [now], die vor [resume] liegen – also durch eine Pause bis
+     * ausschließlich [resume] ausfallen würden. Höchstens [limit] Stück. */
+    fun occurrencesSkippedBy(resume: LocalDate, now: LocalDateTime, limit: Int = 1000): List<LocalDateTime> {
+        val result = mutableListOf<LocalDateTime>()
+        var from = now
+        while (result.size < limit) {
+            val next = recurrence.nextOccurrence(time, from) ?: break
+            if (!next.toLocalDate().isBefore(resume)) break
+            result += next
+            from = next
+        }
+        return result
+    }
+
+    /**
+     * Nächster regulärer Klingelzeitpunkt als Instant, echt nach [now] und nie für einen Termin bis
+     * einschließlich [lastRung] (Ortszeit des zuletzt geklungenen Termins).
+     *
+     * Bei der Zeitumstellung im Herbst gibt es die Uhrzeiten zwischen 02:00 und 03:00 zweimal;
+     * `LocalDateTime.atZone` nimmt dann die erste (Sommerzeit). Hatte ein Wecker um 02:30 schon
+     * geklingelt, lag dieser Zeitpunkt in der zweiten Runde in der Vergangenheit – der AlarmManager
+     * löste sofort aus, die Neuplanung fand wieder denselben Zeitpunkt: eine Klingelschleife bis
+     * 02:30 Winterzeit. [lastRung] verhindert das (und ein zweites Klingeln um 02:30 Winterzeit),
+     * und ein Termin, dessen erste Variante schon vorbei ist, bekommt die spätere.
+     */
+    fun nextRegularInstant(now: Instant, zone: ZoneId, lastRung: LocalDateTime? = null): Instant? {
+        val nowLocal = LocalDateTime.ofInstant(now, zone)
+        var after = if (lastRung != null && lastRung.isAfter(nowLocal)) lastRung else nowLocal
+        repeat(4) {
+            val local = nextRegularOccurrence(after) ?: return null
+            val zoned = local.atZone(zone)
+            if (zoned.toInstant().isAfter(now)) return zoned.toInstant()
+            val later = zoned.withLaterOffsetAtOverlap().toInstant()
+            if (later.isAfter(now)) return later
+            after = local
+        }
+        return null
+    }
 
     /** Nächster regulärer Termin nach [now] – ohne Schlummern, mit Berücksichtigung einer Pause. */
     fun nextRegularOccurrence(now: LocalDateTime): LocalDateTime? {
@@ -65,6 +124,22 @@ data class Alarm(
     companion object {
         /** Ein Wecker gilt erst als verpasst, wenn sein Zeitpunkt länger als das zurückliegt. */
         const val MISSED_GRACE_MILLIS = 60_000L
+    }
+}
+
+enum class PauseUnit(val one: String, val many: String, val max: Int) {
+    DAYS("Tag", "Tage", 365),
+    WEEKS("Woche", "Wochen", 52),
+    MONTHS("Monat", "Monate", 24),
+    /** Die nächsten n Termine auslassen – kein Kalenderzeitraum, siehe [Alarm.resumeAfterSkipping]. */
+    OCCURRENCES("Termin", "Termine", 99);
+
+    /** Wiederbeginn für einen Kalenderzeitraum ab [from]; nicht für [OCCURRENCES]. */
+    fun plus(from: LocalDate, amount: Int): LocalDate = when (this) {
+        DAYS -> from.plusDays(amount.toLong())
+        WEEKS -> from.plusWeeks(amount.toLong())
+        MONTHS -> from.plusMonths(amount.toLong())
+        OCCURRENCES -> error("OCCURRENCES hat keinen festen Zeitraum")
     }
 }
 

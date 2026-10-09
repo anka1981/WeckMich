@@ -10,15 +10,32 @@ import com.andik.wecker.data.AlarmStore
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Alarms.ACTION_FIRE) return
+        WakeBridge.acquire(context) // bis der Klingeldienst seinen eigenen Wakelock hat
         AlarmStore.init(context)
         val id = intent.getIntExtra(Alarms.EXTRA_ID, -1)
-        val alarm = Alarms.onFired(context, id) ?: return
-        ContextCompat.startForegroundService(
-            context,
-            Intent(context, AlarmService::class.java)
-                .setAction(AlarmService.ACTION_RING)
-                .putExtra(Alarms.EXTRA_ID, alarm.id),
-        )
+        val known = Alarms.onFired(context, id)
+        // Waren die gespeicherten Wecker unlesbar, ist eine Auslösung mit unbekannter ID trotzdem ein
+        // gestellter Wecker – lieber mit Standardton klingeln als still bleiben. (Gelöschte Wecker
+        // werden beim Löschen beim AlarmManager abgemeldet und kommen hier nicht an.)
+        val unknown = known == null && AlarmStore.loadProblem && AlarmStore.get(id) == null
+        if (known == null && !unknown) {
+            WakeBridge.release()
+            return
+        }
+        try {
+            ContextCompat.startForegroundService(
+                context,
+                Intent(context, AlarmService::class.java)
+                    .setAction(AlarmService.ACTION_RING)
+                    .putExtra(Alarms.EXTRA_ID, id)
+                    .putExtra(AlarmService.EXTRA_UNKNOWN, unknown),
+            )
+        } catch (e: Exception) {
+            // Dienststart verweigert (Akku „Eingeschränkt“, Herstellerbeschränkung …): Notfall-Klingeln.
+            WakeBridge.release()
+            val now = java.time.LocalTime.now()
+            EmergencyAlarm.ring(context, known ?: com.andik.wecker.model.Alarm(id = id, hour = now.hour, minute = now.minute))
+        }
     }
 }
 

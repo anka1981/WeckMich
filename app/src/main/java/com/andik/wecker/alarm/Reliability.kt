@@ -1,6 +1,7 @@
 package com.andik.wecker.alarm
 
 import android.Manifest
+import android.app.ActivityManager
 import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
@@ -13,6 +14,7 @@ import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.andik.wecker.data.AlarmStore
 
 /** Ein Umstand, der das Klingeln verhindern oder stören kann, samt passender Einstellungsseite. */
 data class Issue(
@@ -93,6 +95,48 @@ object Reliability {
                     critical = true,
                 )
             }
+        }
+
+        // Akku „Eingeschränkt“: Android selbst lässt Wecker-Apps trotzdem klingeln (im Emulator geprüft),
+        // manche Hersteller blockieren den Klingeldienst dann aber – dafür gibt es das Notfall-Klingeln.
+        if (Build.VERSION.SDK_INT >= 28 && context.getSystemService(ActivityManager::class.java).isBackgroundRestricted) {
+            result += Issue(
+                "Akku-Nutzung ist „Eingeschränkt“",
+                "Manche Hersteller blockieren den Wecker dann im Hintergrund. Sicherer ist „Optimiert“ oder „Nicht eingeschränkt“.",
+                "Ändern",
+                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, pkg),
+                critical = false,
+            )
+        }
+
+        // Klingel-Kanal einzeln abgeschaltet oder heruntergestuft: dann kein Vollbild und keine Knöpfe
+        // zum Beenden/Schlummern, obwohl der Ton läuft.
+        val channel = nm.getNotificationChannel(AlarmService.CHANNEL_ID)
+        if (notificationsAllowed && channel != null && channel.importance < NotificationManager.IMPORTANCE_HIGH) {
+            result += Issue(
+                "Benachrichtigung „Klingelnder Wecker“ abgeschwächt",
+                "Der klingelnde Wecker erscheint dann nicht auf dem Bildschirm. Stell die Kategorie wieder auf „Pop-up/Dringend“.",
+                "Ändern",
+                Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    .putExtra(Settings.EXTRA_CHANNEL_ID, AlarmService.CHANNEL_ID),
+                critical = true,
+            )
+        }
+
+        if (AlarmStore.loadProblem) {
+            result += Issue(
+                "Gespeicherte Wecker waren beschädigt",
+                "Einige Wecker konnten nicht gelesen werden – bitte die Liste prüfen und fehlende Wecker neu anlegen. Bereits geplante klingeln trotzdem.",
+                null, null, critical = true,
+            )
+        }
+        if (AlarmStore.writeFailed.value) {
+            result += Issue(
+                "Wecker konnten nicht gespeichert werden",
+                "Vermutlich ist der Speicher voll. Nach einem Neustart fehlen sonst die letzten Änderungen.",
+                "Speicher", Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS), critical = true,
+            )
         }
 
         val power = context.getSystemService(PowerManager::class.java)

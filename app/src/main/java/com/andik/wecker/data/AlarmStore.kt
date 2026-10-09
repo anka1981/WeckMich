@@ -3,6 +3,7 @@ package com.andik.wecker.data
 import android.content.Context
 import android.content.SharedPreferences
 import com.andik.wecker.model.Alarm
+import com.andik.wecker.model.PauseUnit
 import com.andik.wecker.model.Recurrence
 import com.andik.wecker.model.RepeatType
 import com.andik.wecker.model.Settings
@@ -31,13 +32,18 @@ object AlarmStore {
             .getSharedPreferences("wecker", Context.MODE_PRIVATE)
         val raw = prefs.getString("alarms", "[]") ?: "[]"
         val arr = runCatching { JSONArray(raw) }.getOrNull()
+        // Fehlerhafte Daten werden gesichert und in der App gemeldet (siehe [loadProblem]); geplante
+        // Auslösungen klingeln dann trotzdem (AlarmReceiver), statt still verworfen zu werden.
+        if (arr == null) loadProblem = true
         if (arr == null) {
             // Unlesbare Daten nicht beim nächsten Speichern stillschweigend überschreiben, sondern sichern.
             prefs.edit().putString("alarms_unlesbar_${System.currentTimeMillis()}", raw).commit()
         }
         _alarms.value = arr?.let { a ->
             // Einzelne kaputte Einträge überspringen statt alle Wecker zu verlieren.
-            (0 until a.length()).mapNotNull { i -> runCatching { alarmFromJson(a.getJSONObject(i)) }.getOrNull() }
+            (0 until a.length()).mapNotNull { i ->
+                runCatching { alarmFromJson(a.getJSONObject(i)) }.getOrNull().also { if (it == null) loadProblem = true }
+            }
         } ?: emptyList()
         _settings.value = Settings(
             snoozeMinutes = prefs.getInt("snoozeMinutes", 10),
@@ -45,6 +51,14 @@ object AlarmStore {
             rampSeconds = prefs.getInt("rampSeconds", 0),
         )
     }
+
+    /** Gespeicherte Wecker waren (teilweise) unlesbar. */
+    @Volatile var loadProblem = false
+        private set
+
+    /** Letzter Schreibversuch fehlgeschlagen (z. B. Speicher voll) – die App zeigt einen Hinweis. */
+    private val _writeFailed = MutableStateFlow(false)
+    val writeFailed: StateFlow<Boolean> = _writeFailed.asStateFlow()
 
     fun get(id: Int): Alarm? = _alarms.value.firstOrNull { it.id == id }
 
@@ -79,11 +93,12 @@ object AlarmStore {
 
     private fun persist(list: List<Alarm>) {
         val sorted = list.sortedWith(compareBy({ it.hour }, { it.minute }, { it.id }))
+        if (sorted == _alarms.value && !_writeFailed.value) return // nichts geändert – nicht schreiben
         _alarms.value = sorted
         val arr = JSONArray()
         sorted.forEach { arr.put(alarmToJson(it)) }
         // commit statt apply: Empfänger laufen nur kurz, die Änderung muss sicher auf der Platte landen.
-        prefs.edit().putString("alarms", arr.toString()).commit()
+        _writeFailed.value = !prefs.edit().putString("alarms", arr.toString()).commit()
     }
 
     private fun alarmToJson(a: Alarm) = JSONObject().apply {
@@ -101,6 +116,9 @@ object AlarmStore {
         put("temporary", a.temporary)
         put("scheduledAt", a.scheduledAt)
         put("pausedUntil", a.pausedUntil?.toString())
+        put("lastPauseAmount", a.lastPauseAmount)
+        put("lastPauseUnit", a.lastPauseUnit.name)
+        put("lastRung", a.lastRung?.toString())
         val r = a.recurrence
         put("recurrence", JSONObject().apply {
             put("type", r.type.name)
@@ -132,6 +150,9 @@ object AlarmStore {
             temporary = o.optBoolean("temporary", false),
             scheduledAt = if (o.has("scheduledAt") && !o.isNull("scheduledAt")) o.getLong("scheduledAt") else null,
             pausedUntil = o.stringOrNull("pausedUntil")?.let(LocalDate::parse),
+            lastPauseAmount = o.optInt("lastPauseAmount", 2),
+            lastRung = o.stringOrNull("lastRung")?.let(java.time.LocalDateTime::parse),
+            lastPauseUnit = runCatching { PauseUnit.valueOf(o.optString("lastPauseUnit")) }.getOrDefault(PauseUnit.WEEKS),
             snoozeUntil = if (o.has("snoozeUntil") && !o.isNull("snoozeUntil")) o.getLong("snoozeUntil") else null,
             recurrence = Recurrence(
                 type = runCatching { RepeatType.valueOf(r.optString("type")) }.getOrDefault(RepeatType.ONCE),

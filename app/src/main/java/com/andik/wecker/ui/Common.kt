@@ -20,6 +20,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -69,9 +70,21 @@ fun TimePickDialog(hour: Int, minute: Int, onDismiss: () -> Unit, onConfirm: (In
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickDialog(initial: LocalDate, onDismiss: () -> Unit, onConfirm: (LocalDate) -> Unit) {
+fun DatePickDialog(
+    initial: LocalDate,
+    onDismiss: () -> Unit,
+    /** Frühestes wählbare Datum – frühere Tage sind ausgegraut statt still verworfen zu werden. */
+    minDate: LocalDate? = null,
+    onConfirm: (LocalDate) -> Unit,
+) {
+    val minMillis = minDate?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
+    val start = if (minDate != null && initial.isBefore(minDate)) minDate else initial
     val state = rememberDatePickerState(
-        initialSelectedDateMillis = initial.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
+        initialSelectedDateMillis = start.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long) = minMillis == null || utcTimeMillis >= minMillis
+            override fun isSelectableYear(year: Int) = minDate == null || year >= minDate.year
+        },
     )
     DatePickerDialog(
         onDismissRequest = onDismiss,

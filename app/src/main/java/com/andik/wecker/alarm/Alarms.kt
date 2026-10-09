@@ -11,7 +11,7 @@ import com.andik.wecker.ui.MainActivity
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
-import kotlin.math.abs
+import java.time.temporal.ChronoUnit
 
 /** Speichern und Planen von Weckern an einer Stelle, damit beides nie auseinanderläuft. */
 object Alarms {
@@ -20,9 +20,9 @@ object Alarms {
 
     /** Nächster Klingelzeitpunkt (Wiederholungsregel oder Schlummern, was früher ist) in Epoch-Millis. */
     fun nextFireMillis(a: Alarm, now: Long = System.currentTimeMillis()): Long? {
-        val zone = ZoneId.systemDefault()
-        val regular = a.nextRegularOccurrence(LocalDateTime.ofInstant(Instant.ofEpochMilli(now), zone))
-            ?.atZone(zone)?.toInstant()?.toEpochMilli()
+        // Zeitumstellungs-sicher und nie für den zuletzt geklungenen Termin (siehe nextRegularInstant).
+        val regular = a.nextRegularInstant(Instant.ofEpochMilli(now), ZoneId.systemDefault(), a.lastRung)
+            ?.toEpochMilli()
         val snooze = a.snoozeUntil?.takeIf { it > now }
         return listOfNotNull(regular, snooze).minOrNull()
     }
@@ -47,9 +47,14 @@ object Alarms {
     fun rescheduleAll(context: Context) {
         val now = System.currentTimeMillis()
         val updated = AlarmStore.alarms.value.mapNotNull { a ->
+            // Gerade fällig (z. B. Neustart um 06:00:20 für 06:00): unverändert scharf schalten – der
+            // AlarmManager löst einen vergangenen Zeitpunkt sofort aus. Früher wurde ab "jetzt" neu
+            // gerechnet und der fällige Termin still übersprungen.
+            val due = a.scheduledAt
+            if (due != null && due <= now && due > now - Alarm.MISSED_GRACE_MILLIS) return@mapNotNull a
             val fixed = a.afterMissed(now)
             if (fixed !== a && a.scheduledAt != null && !a.temporary) {
-                MissedNotifier.notify(context, a, a.scheduledAt, "Das Gerät war zu dieser Zeit aus")
+                MissedNotifier.notify(context, a, a.scheduledAt, "Nicht ausgelöst – Gerät aus oder Uhrzeit verstellt")
             }
             if (fixed == null) alarmManager(context).cancel(firePendingIntent(context, a.id))
             fixed?.copy(scheduledAt = nextFireMillis(fixed, now))
@@ -71,18 +76,29 @@ object Alarms {
     fun onFired(context: Context, id: Int): Alarm? {
         val a = AlarmStore.get(id) ?: return null
         val now = System.currentTimeMillis()
-        val isSnooze = a.snoozeUntil != null && abs(now - a.snoozeUntil) < 5 * 60_000L
+        // Schlummern ist fällig, sobald seine Zeit (fast) erreicht ist – ohne Obergrenze: eine verspätete
+        // Zustellung klingelt trotzdem, statt als "veraltet" verworfen zu werden.
+        val isSnooze = a.snoozeUntil != null && now >= a.snoozeUntil - EARLY_TOLERANCE_MILLIS
         if (!isSnooze && !a.enabled) {
             save(context, a)
             return null
         }
+        val zone = ZoneId.systemDefault()
         val updated = when {
             isSnooze -> a.copy(snoozeUntil = null)
-            a.recurrence.type == RepeatType.ONCE -> a.copy(enabled = false, snoozeUntil = null)
-            else -> a.copy(snoozeUntil = null)
+            else -> {
+                // Den geklungenen Termin merken: er wird nie erneut geplant (Zeitumstellung, zu frühe
+                // Zustellung, Uhr zurückgestellt).
+                val rung = LocalDateTime.ofInstant(Instant.ofEpochMilli(a.scheduledAt ?: now), zone)
+                    .truncatedTo(ChronoUnit.MINUTES)
+                a.copy(
+                    snoozeUntil = null,
+                    lastRung = rung,
+                    enabled = a.enabled && a.recurrence.type != RepeatType.ONCE,
+                )
+            }
         }
-        // Eine Minute Vorlauf, damit ein minimal zu früh ausgelöster Wecker nicht gleich nochmal geplant wird.
-        save(context, updated, now + 60_000L)
+        save(context, updated, now)
         return updated
     }
 
@@ -106,6 +122,8 @@ object Alarms {
             am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi)
         }
     }
+
+    private const val EARLY_TOLERANCE_MILLIS = 60_000L
 
     private fun alarmManager(context: Context) = context.getSystemService(AlarmManager::class.java)
 

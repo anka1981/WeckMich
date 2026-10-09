@@ -1,5 +1,11 @@
 package com.andik.wecker.ui
 
+import kotlinx.coroutines.launch
+import com.andik.wecker.data.SoundFiles
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.Lifecycle
+import androidx.compose.runtime.rememberCoroutineScope
+import android.widget.Toast
 import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
@@ -103,6 +109,8 @@ private class Preview(private val context: Context) {
             )
             mp.setDataSource(context, uri)
             mp.setOnPreparedListener { it.start() }
+            // Nach einmaligem Abspielen freigeben statt den Player offen zu halten.
+            mp.setOnCompletionListener { if (player === it) stop() }
             mp.prepareAsync()
             player = mp
         } catch (e: Exception) {
@@ -145,17 +153,28 @@ fun SoundPickerDialog(current: String?, onDismiss: () -> Unit, onConfirm: (Sound
         sections = loaded
     }
 
+    val scope = rememberCoroutineScope()
+    var copying by remember { mutableStateOf(false) }
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
-        // Dauerhafte Leseberechtigung, damit der Ton auch nach einem Neustart noch abspielbar ist.
-        runCatching {
-            context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        copying = true
+        scope.launch {
+            val name = withContext(Dispatchers.IO) { fileName(context, uri) }
+            val local = withContext(Dispatchers.IO) { SoundFiles.import(context, uri) }
+            copying = false
+            if (local == null) {
+                Toast.makeText(context, "Datei konnte nicht übernommen werden (zu groß oder nicht lesbar).", Toast.LENGTH_LONG).show()
+                return@launch
+            }
+            val sound = Sound(local.toString(), name)
+            custom = sound
+            selected = sound
+            preview.play(local)
         }
-        val sound = Sound(uri.toString(), fileName(context, uri))
-        custom = sound
-        selected = sound
-        preview.play(uri)
     }
+    // Vorhören endet, sobald die App in den Hintergrund geht – sonst spielte eine lange eigene
+    // Datei in Weckerlautstärke weiter.
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { preview.stop() }
 
     fun select(sound: Sound) {
         selected = sound
@@ -180,7 +199,7 @@ fun SoundPickerDialog(current: String?, onDismiss: () -> Unit, onConfirm: (Sound
             LazyColumn(Modifier.padding(padding).fillMaxSize()) {
                 item {
                     ListItem(
-                        headlineContent = { Text("Eigene Audiodatei wählen …") },
+                        headlineContent = { Text(if (copying) "Datei wird übernommen …" else "Eigene Audiodatei wählen …") },
                         leadingContent = { Icon(Icons.Filled.FolderOpen, null) },
                         modifier = Modifier.selectable(false) { filePicker.launch(arrayOf("audio/*")) },
                     )

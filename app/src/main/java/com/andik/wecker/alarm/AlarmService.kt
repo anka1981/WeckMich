@@ -56,6 +56,10 @@ class AlarmService : Service() {
 
     private var ringStartedAt = 0L
     private var rampMillis = 0L
+    private var lastStartId = 0
+    /** Zählt Ton-Startversuche hoch; Rückrufe eines überholten Versuchs werden ignoriert. */
+    private var soundAttempt = 0
+    private var prepareTimeout: Runnable? = null
 
     private val timeout = Runnable {
         val alarm = RingingState.ringing.value
@@ -79,14 +83,20 @@ class AlarmService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        lastStartId = startId
         AlarmStore.init(this)
         val id = intent?.getIntExtra(Alarms.EXTRA_ID, -1) ?: -1
         when (intent?.action) {
             ACTION_RING -> {
+                // Unbekannte ID bei unlesbaren Daten: lieber mit Standardton klingeln als still bleiben.
                 val alarm = AlarmStore.get(id)
+                    ?: if (intent.getBooleanExtra(EXTRA_UNKNOWN, false)) unknownAlarm(id) else null
                 // startForeground muss nach startForegroundService in jedem Fall folgen.
                 goForeground(alarm)
                 if (alarm == null) finishRinging() else ring(alarm)
+                // Beendet das System den Prozess während des Klingelns, wird der Dienst mit demselben
+                // Intent neu gestartet und klingelt weiter, statt still zu verstummen.
+                return START_REDELIVER_INTENT
             }
             ACTION_SNOOZE -> {
                 (RingingState.ringing.value?.id ?: id.takeIf { it >= 0 })?.let { Alarms.snooze(this, it) }
@@ -107,6 +117,11 @@ class AlarmService : Service() {
     }
 
     private fun ring(alarm: Alarm) {
+        // Ein noch klingelnder anderer Wecker wird abgelöst – mit Hinweis, statt spurlos zu verschwinden.
+        RingingState.ringing.value?.takeIf { it.id != alarm.id }?.let { previous ->
+            if (previous.temporary) Alarms.delete(this, previous.id)
+            else MissedNotifier.notify(this, previous, ringStartedAt, "Von einem weiteren Wecker abgelöst")
+        }
         stopPlayback()
         RingingState.current.value = alarm
         val settings = AlarmStore.settings.value
@@ -114,9 +129,14 @@ class AlarmService : Service() {
         wakeLock = getSystemService(PowerManager::class.java)
             .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WeckMich:klingeln")
             .apply { acquire(wakeMillis) }
+        WakeBridge.release() // eigener Wakelock hält jetzt
         ringStartedAt = System.currentTimeMillis()
-        startSound(alarm, AlarmStore.rampSecondsFor(alarm))
+        // Vibration zuerst: sie braucht nichts zu laden und meldet sich sofort.
         if (alarm.vibrate) startVibration()
+        // Der Anstieg darf höchstens die halbe Klingeldauer dauern – sonst verstummt der Wecker, bevor
+        // er hörbar wird (z. B. „verstummt nach 1 Min.“ mit „lauter werden in 5 Min.“).
+        val maxRamp = if (settings.ringMinutes > 0) settings.ringMinutes * 30 else Int.MAX_VALUE
+        startSound(alarm, AlarmStore.rampSecondsFor(alarm).coerceAtMost(maxRamp))
         if (settings.ringMinutes > 0) handler.postDelayed(timeout, settings.ringMinutes * 60_000L)
         // Vollbild-Aktivität zusätzlich direkt starten; klappt nur, wenn das System es gerade zulässt
         // (sonst übernimmt die Vollbild-Benachrichtigung bzw. die Heads-up-Benachrichtigung).
@@ -139,37 +159,46 @@ class AlarmService : Service() {
         ).distinct()
         rampMillis = rampSeconds * 1000L
         volume = if (rampSeconds > 0) rampGain(0f) else 1f
-        if (playFirstWorking(candidates) && rampSeconds > 0) handler.postDelayed(ramp, 250)
+        playCandidate(candidates, 0)
     }
 
-    /** Spielt den ersten abspielbaren Ton; fällt er unterwegs aus, geht es mit dem nächsten weiter. */
-    private fun playFirstWorking(candidates: List<Uri>): Boolean {
-        candidates.forEachIndexed { i, uri ->
-            val mp = MediaPlayer()
-            try {
-                mp.setAudioAttributes(ALARM_AUDIO)
-                mp.setDataSource(this, uri)
-                mp.isLooping = true
-                // Hält die CPU wach, solange der Ton läuft – auch über das Zeitlimit des Wakelocks hinaus.
-                mp.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK)
-                mp.setOnErrorListener { failed, _, _ ->
-                    failed.release()
-                    if (player === failed) {
-                        player = null
-                        playFirstWorking(candidates.drop(i + 1))
-                    }
-                    true
-                }
-                mp.prepare()
-                mp.setVolume(volume, volume)
-                mp.start()
-                player = mp
-                return true
-            } catch (e: Exception) {
-                mp.release()
-            }
+    /**
+     * Spielt den Ton [candidates] Nr. [index] – asynchron vorbereitet und mit Zeitlimit: ein langsam
+     * ladender Ton (eigene Datei, Speicher noch gesperrt) darf das Klingeln weder blockieren noch
+     * verhindern. Lädt er nicht rechtzeitig oder fällt er unterwegs aus, kommt der nächste Kandidat;
+     * der letzte ist der eingebaute Ton.
+     */
+    private fun playCandidate(candidates: List<Uri>, index: Int) {
+        if (index >= candidates.size) return
+        val attempt = ++soundAttempt
+        val mp = MediaPlayer()
+        fun next() {
+            if (attempt != soundAttempt) return
+            prepareTimeout?.let(handler::removeCallbacks)
+            if (player === mp) player = null
+            mp.release()
+            playCandidate(candidates, index + 1)
         }
-        return false
+        try {
+            mp.setAudioAttributes(ALARM_AUDIO)
+            mp.setDataSource(this, candidates[index])
+            mp.isLooping = true
+            // Hält die CPU wach, solange der Ton läuft – auch über das Zeitlimit des Wakelocks hinaus.
+            mp.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK)
+            mp.setOnPreparedListener { prepared ->
+                if (attempt != soundAttempt) return@setOnPreparedListener
+                prepareTimeout?.let(handler::removeCallbacks)
+                prepared.setVolume(volume, volume)
+                prepared.start()
+                if (rampMillis > 0) handler.post(ramp)
+            }
+            mp.setOnErrorListener { _, _, _ -> next(); true }
+            player = mp
+            prepareTimeout = Runnable { next() }.also { handler.postDelayed(it, PREPARE_TIMEOUT_MILLIS) }
+            mp.prepareAsync()
+        } catch (e: Exception) {
+            next()
+        }
     }
 
     private fun startVibration() {
@@ -190,6 +219,9 @@ class AlarmService : Service() {
     }
 
     private fun stopPlayback() {
+        soundAttempt++ // laufende Ladeversuche verwerfen
+        prepareTimeout?.let(handler::removeCallbacks)
+        prepareTimeout = null
         handler.removeCallbacks(timeout)
         handler.removeCallbacks(ramp)
         player?.runCatching { stop(); release() }
@@ -207,8 +239,16 @@ class AlarmService : Service() {
         stopPlayback()
         if (alarm != null && alarm.temporary && !snoozed) Alarms.delete(this, alarm.id)
         RingingState.current.value = null
+        WakeBridge.release()
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
-        stopSelf()
+        // Nur beenden, wenn seitdem kein neuer Auftrag kam – sonst würde ein direkt folgender zweiter
+        // Wecker sofort wieder verstummen.
+        stopSelfResult(lastStartId)
+    }
+
+    private fun unknownAlarm(id: Int): Alarm {
+        val now = java.time.LocalTime.now()
+        return Alarm(id = id, hour = now.hour, minute = now.minute, label = "Wecker")
     }
 
     override fun onDestroy() {
@@ -250,6 +290,8 @@ class AlarmService : Service() {
         const val ACTION_SNOOZE = "com.andik.wecker.SNOOZE"
         const val ACTION_DISMISS = "com.andik.wecker.DISMISS"
         const val CHANNEL_ID = "klingeln"
+        const val EXTRA_UNKNOWN = "unknownAlarm"
+        private const val PREPARE_TIMEOUT_MILLIS = 4_000L
         private val ALARM_AUDIO: AudioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_ALARM)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)

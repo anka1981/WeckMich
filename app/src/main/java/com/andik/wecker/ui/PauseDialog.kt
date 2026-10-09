@@ -2,10 +2,13 @@ package com.andik.wecker.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -20,60 +23,83 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.andik.wecker.model.Alarm
 import com.andik.wecker.model.Format
+import com.andik.wecker.model.PauseUnit
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-enum class PauseUnit(val one: String, val many: String, val max: Int) {
-    DAYS("Tag", "Tage", 365),
-    WEEKS("Woche", "Wochen", 52),
-    MONTHS("Monat", "Monate", 24);
+private fun day(d: LocalDate, today: LocalDate) = Format.date(d, withYear = d.year != today.year)
 
-    fun resumeDate(from: LocalDate, amount: Int): LocalDate = when (this) {
-        DAYS -> from.plusDays(amount.toLong())
-        WEEKS -> from.plusWeeks(amount.toLong())
-        MONTHS -> from.plusMonths(amount.toLong())
-    }
-}
-
-/** „Pausiert – wieder ab Fr., 23. Okt.“ */
+/** „Pausiert bis einschließlich Di., 8. Dez.“ – der letzte ausgesetzte Tag, nicht der Tag danach:
+ * „wieder ab Mi., 9. Dez.“ las sich, als klinge der Wecker an diesem Mittwoch. */
 fun pauseText(alarm: Alarm, today: LocalDate): String? =
     alarm.pausedUntil?.takeIf { alarm.isPaused(today) }?.let {
-        "Pausiert – wieder ab ${Format.date(it, withYear = it.year != today.year)}"
+        "Pausiert bis einschließlich ${day(it.minusDays(1), today)}"
     }
+
+/** „Es entfallen 2 Termine: Mo., 12. Okt. · Mo., 19. Okt.“ – bei vielen nur die ersten. */
+private fun skippedText(skipped: List<LocalDateTime>, today: LocalDate): String {
+    if (skipped.isEmpty()) return "Es entfällt kein Termin."
+    val shown = skipped.take(4).joinToString(" · ") { day(it.toLocalDate(), today) }
+    val more = if (skipped.size > 4) " und ${skipped.size - 4} weitere" else ""
+    return if (skipped.size == 1) "Es entfällt 1 Termin: $shown" else "Es entfallen ${skipped.size} Termine: $shown$more"
+}
+
+private fun nextText(next: LocalDateTime?, today: LocalDate): String =
+    next?.let { "Nächster Termin: ${day(it.toLocalDate(), today)}, ${Format.time(it)}" }
+        ?: "Danach gibt es keinen Termin mehr."
 
 /**
  * Setzt einen wiederholenden Wecker für eine Zeit aus: ab heute für n Tage/Wochen/Monate oder bis
  * einschließlich eines gewählten Datums. [onPause] bekommt den ersten Tag, an dem er wieder klingelt.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PauseDialog(
     alarm: Alarm,
     onDismiss: () -> Unit,
-    onPause: (resume: LocalDate) -> Unit,
+    onPause: (resume: LocalDate, amount: Int, unit: PauseUnit) -> Unit,
     onResume: () -> Unit,
 ) {
     val today = LocalDate.now()
-    var amount by rememberSaveable { mutableIntStateOf(2) }
-    var unit by rememberSaveable { mutableStateOf(PauseUnit.WEEKS) }
+    // Startet mit der zuletzt für diesen Wecker gewählten Dauer.
+    var amount by rememberSaveable { mutableIntStateOf(alarm.lastPauseAmount) }
+    var unit by rememberSaveable { mutableStateOf(alarm.lastPauseUnit) }
     var pickDate by remember { mutableStateOf(false) }
 
-    val resume = unit.resumeDate(today, amount)
+    // Gezählt wird ab heute, wie man „2 Wochen Pause“ versteht. Damit klar ist, was das bewirkt
+    // (z. B. abends nach der Weckzeit: „1 Tag“ lässt nichts ausfallen), listet der Dialog die
+    // ausfallenden Termine auf.
+    val resume = remember(alarm, unit, amount) {
+        if (unit == PauseUnit.OCCURRENCES) alarm.resumeAfterSkipping(amount, LocalDateTime.now())
+        else unit.plus(today, amount)
+    }
+    val skipped = remember(alarm, resume) { alarm.occurrencesSkippedBy(resume, LocalDateTime.now()) }
     val next = remember(alarm, resume) {
         alarm.copy(pausedUntil = resume, snoozeUntil = null).nextRegularOccurrence(LocalDateTime.now())
     }
+    val currentNext = remember(alarm) { alarm.copy(snoozeUntil = null).nextRegularOccurrence(LocalDateTime.now()) }
+    val paused = alarm.isPaused(today)
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Wecker aussetzen") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                pauseText(alarm, today)?.let {
-                    Text(it, color = MaterialTheme.colorScheme.primary)
+                if (paused) {
+                    Text("Aktuell", style = MaterialTheme.typography.titleSmall)
+                    Text(pauseText(alarm, today).orEmpty(), color = MaterialTheme.colorScheme.primary)
+                    Text(nextText(currentNext, today), style = MaterialTheme.typography.bodySmall)
                     TextButton(onClick = onResume, modifier = Modifier.padding(start = 0.dp)) { Text("Pause beenden") }
+                    HorizontalDivider()
                 }
-                Text("Ab heute aussetzen für", style = MaterialTheme.typography.titleSmall)
+                Text(
+                    ((if (paused) "Neue Pause (ersetzt die aktuelle) – " else "") +
+                        if (unit == PauseUnit.OCCURRENCES) "die nächsten Termine auslassen:" else "ab heute aussetzen für")
+                        .replaceFirstChar { it.uppercase() },
+                    style = MaterialTheme.typography.titleSmall,
+                )
                 Stepper(amount, 1..unit.max, "$amount") { amount = it }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     PauseUnit.entries.forEach { u ->
                         FilterChip(
                             selected = u == unit,
@@ -83,28 +109,31 @@ fun PauseDialog(
                     }
                 }
                 Text(
-                    "Klingelt wieder ab ${Format.date(resume, withYear = resume.year != today.year)}",
+                    "Ausgesetzt bis einschließlich ${day(resume.minusDays(1), today)}",
                     style = MaterialTheme.typography.bodyMedium,
                 )
+                Text(skippedText(skipped, today), style = MaterialTheme.typography.bodyMedium)
                 Text(
-                    next?.let { "Nächster Termin: ${Format.date(it.toLocalDate(), withYear = it.year != today.year)}, ${Format.time(it)}" }
-                        ?: "Danach gibt es keinen Termin mehr.",
+                    nextText(next, today),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 TextButton(onClick = { pickDate = true }) { Text("Stattdessen bis einschließlich Datum …") }
             }
         },
-        confirmButton = { TextButton(onClick = { onPause(resume) }) { Text("Aussetzen") } },
+        confirmButton = { TextButton(onClick = { onPause(resume, amount, unit) }) { Text(if (paused) "Pause ersetzen" else "Aussetzen") } },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Abbrechen") } },
     )
 
     if (pickDate) {
-        DatePickDialog(alarm.pausedUntil?.minusDays(1)?.takeIf { it.isAfter(today) } ?: today.plusWeeks(1),
-            onDismiss = { pickDate = false }) { lastPausedDay ->
+        DatePickDialog(
+            alarm.pausedUntil?.minusDays(1)?.takeIf { it.isAfter(today) } ?: today.plusWeeks(1),
+            onDismiss = { pickDate = false },
+            minDate = today,
+        ) { lastPausedDay ->
             pickDate = false
-            // Ein Datum heute oder in der Vergangenheit würde nichts aussetzen.
-            if (lastPausedDay.isAfter(today.minusDays(1))) onPause(lastPausedDay.plusDays(1))
+            // Ein Datum in der Vergangenheit setzt nichts aus (der DatePicker lässt es nicht zu).
+            if (!lastPausedDay.isBefore(today)) onPause(lastPausedDay.plusDays(1), amount, unit)
         }
     }
 }
