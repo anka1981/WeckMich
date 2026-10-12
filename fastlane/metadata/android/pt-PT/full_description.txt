@@ -1,0 +1,31 @@
+<p><b>Um despertador que segue o seu ritmo – mesmo quando muda de semana para semana.</b></p>
+
+<p>Semanas A/B na escola, turnos da manhã e da tarde, um horário da universidade que muda semana sim, semana não: com o Acorda-me, define cada alarme uma só vez com uma regra flexível e ele toca simplesmente nos dias certos. Acabou-se ligar e desligar alarmes todos os domingos à noite.</p>
+
+<p><b>Regras que o relógio integrado não consegue fazer</b></p>
+<ul>
+<li><b>A cada n semanas</b> nos dias escolhidos – p. ex. segunda e quinta-feira, semana sim, semana não; a data de início decide que semana conta</li>
+<li><b>Mensalmente num dia da semana</b> – p. ex. a 1.ª terça-feira, a 1.ª e a 3.ª quinta-feira ou a última sexta-feira do mês</li>
+<li><b>Mensalmente num dia</b> – p. ex. no dia 15 ou no último dia do mês</li>
+<li>A cada n dias, anualmente ou uma só vez – cada uma com data de início e data de fim opcional</li>
+</ul>
+<p>Uma pré-visualização mostra as próximas ocorrências, para ver de relance se a regra está certa.</p>
+
+<p><b>Suspender em vez de eliminar</b><br/>
+Vai de férias? Suspenda os alarmes repetidos durante dias, semanas ou meses, por um número de ocorrências ou até uma data. A app mostra que ocorrências são ignoradas e depois continua sozinha.</p>
+
+<p><b>Ao acordar</b></p>
+<ul>
+<li>Vire o telefone para baixo para adiar</li>
+<li>Duração do adiamento e volume gradual por alarme ou como predefinição</li>
+<li>Sons de alarme e toques do dispositivo ou um ficheiro de áudio próprio</li>
+<li>Toca de forma fiável em modo Doze, com a poupança de bateria e com Não incomodar e, após um reinício, mesmo antes do primeiro desbloqueio</li>
+<li>Verifica permissões, volume do alarme e Não incomodar e avisa sobre tudo o que impediria o alarme de tocar</li>
+<li>Aviso «Alarme perdido» se o dispositivo estava desligado ou o alarme parou sem resposta</li>
+<li>Alarme de teste dentro de 1 minuto</li>
+</ul>
+
+<p><b>Privacidade</b><br/>
+Sem permissão de Internet, sem anúncios, sem rastreamento. Os seus alarmes ficam no seu dispositivo.</p>
+
+<p>Disponível em inglês, alemão, francês, espanhol, italiano, português e neerlandês; a app segue o idioma do sistema.</p>

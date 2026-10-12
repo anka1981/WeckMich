@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ImpliedQuantity: Einheiten ohne Zahl stehen neben einem Zähler ab 1. MissingQuantity: „many“ gilt erst ab einer Million. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity,MissingQuantity">
+    <string name="app_name">Weck mich</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="done">Fertig</string>
+    <string name="back">Zurück</string>
+    <string name="alarm_default_label">Wecker</string>
+    <string name="snooze">Schlummern</string>
+    <string name="dismiss">Beenden</string>
+    <string name="today">Heute</string>
+    <string name="tomorrow">Morgen</string>
+    <string name="never">Nie</string>
+    <string name="time">Uhrzeit</string>
+    <string name="decrease">%s verringern</string>
+    <string name="increase">%s erhöhen</string>
+
+    <string name="alarms_title">Wecker</string>
+    <string name="settings">Einstellungen</string>
+    <string name="help">Hilfe</string>
+    <string name="add_alarm">Wecker hinzufügen</string>
+    <string name="no_alarms">Noch keine Wecker</string>
+    <string name="no_further_occurrence">Für diese Regel gibt es keinen weiteren Termin</string>
+    <string name="alarm_rings_in">Wecker klingelt %s</string>
+    <string name="ringing_banner">Klingelt: %1$s %2$s</string>
+    <string name="setting_open_failed">Einstellung konnte nicht geöffnet werden</string>
+    <string name="change_time">Uhrzeit ändern</string>
+    <string name="alarm_switch">Wecker %s</string>
+    <string name="expand">Aufklappen</string>
+    <string name="collapse">Zuklappen</string>
+    <string name="repeat">Wiederholung</string>
+    <string name="pause">Aussetzen</string>
+    <string name="pause_hint">Für Tage, Wochen oder Monate pausieren</string>
+    <string name="label">Label</string>
+    <string name="label_add">Hinzufügen</string>
+    <string name="label_placeholder">z. B. Biomüll</string>
+    <string name="sound">Weckton</string>
+    <string name="default_value">Standard (%s)</string>
+    <string name="ramp_title">Lauter werden</string>
+    <string name="vibrate">Vibrieren</string>
+    <string name="delete">Löschen</string>
+    <string name="snooze_length">Schlummerdauer</string>
+    <string name="snoozing_until">Schlummert bis %s</string>
+    <string name="no_more_occurrences">Keine weiteren Termine</string>
+
+    <string name="paused_through">Pausiert bis einschließlich %s</string>
+    <string name="skipped_none">Es entfällt kein Termin.</string>
+    <plurals name="skipped">
+        <item quantity="one">Es entfällt %1$d Termin: %2$s</item>
+        <item quantity="other">Es entfallen %1$d Termine: %2$s</item>
+    </plurals>
+    <plurals name="skipped_more">
+        <item quantity="one">und %d weiterer</item>
+        <item quantity="other">und %d weitere</item>
+    </plurals>
+    <string name="next_occurrence">Nächster Termin: %1$s, %2$s</string>
+    <string name="no_occurrence_after">Danach gibt es keinen Termin mehr.</string>
+    <string name="pause_title">Wecker aussetzen</string>
+    <string name="pause_current">Aktuell</string>
+    <string name="pause_end">Pause beenden</string>
+    <string name="pause_heading_period">Ab heute aussetzen für</string>
+    <string name="pause_heading_occurrences">Die nächsten Termine auslassen:</string>
+    <string name="pause_heading_replace_period">Neue Pause (ersetzt die aktuelle) – ab heute aussetzen für</string>
+    <string name="pause_heading_replace_occurrences">Neue Pause (ersetzt die aktuelle) – die nächsten Termine auslassen:</string>
+    <string name="pause_count">Anzahl</string>
+    <string name="pause_preview">Ausgesetzt bis einschließlich %s</string>
+    <string name="pause_until_date">Stattdessen bis einschließlich Datum …</string>
+    <string name="pause_replace">Pause ersetzen</string>
+    <string name="pause_confirm">Aussetzen</string>
+    <plurals name="unit_days">
+        <item quantity="one">Tag</item>
+        <item quantity="other">Tage</item>
+    </plurals>
+    <plurals name="unit_weeks">
+        <item quantity="one">Woche</item>
+        <item quantity="other">Wochen</item>
+    </plurals>
+    <plurals name="unit_months">
+        <item quantity="one">Monat</item>
+        <item quantity="other">Monate</item>
+    </plurals>
+    <plurals name="unit_years">
+        <item quantity="one">Jahr</item>
+        <item quantity="other">Jahre</item>
+    </plurals>
+    <plurals name="unit_occurrences">
+        <item quantity="one">Termin</item>
+        <item quantity="other">Termine</item>
+    </plurals>
+
+    <string name="type_once">Einmalig</string>
+    <string name="type_daily">Täglich / alle n Tage</string>
+    <string name="type_weekly">Wöchentlich / alle n Wochen</string>
+    <string name="type_monthly_day">Monatlich an einem Tag</string>
+    <string name="type_monthly_weekday">Monatlich an einem Wochentag</string>
+    <string name="type_yearly">Jährlich</string>
+    <string name="hint_once">Klingelt ein Mal</string>
+    <string name="hint_daily">z. B. jeden 3. Tag</string>
+    <string name="hint_weekly">z. B. jede 2. Woche montags – A/B-Wochen, Schicht- oder Stundenplan</string>
+    <string name="hint_monthly_day">z. B. am 15. oder am letzten Tag</string>
+    <string name="hint_monthly_weekday">z. B. am 1. Dienstag im Monat</string>
+    <string name="hint_yearly">z. B. jedes Jahr am 8. Okt.</string>
+    <string name="interval">Intervall</string>
+    <plurals name="interval_prefix_days">
+        <item quantity="one">Jeden</item>
+        <item quantity="other">Alle</item>
+    </plurals>
+    <plurals name="interval_prefix_weeks">
+        <item quantity="one">Jede</item>
+        <item quantity="other">Alle</item>
+    </plurals>
+    <plurals name="interval_prefix_months">
+        <item quantity="one">Jeden</item>
+        <item quantity="other">Alle</item>
+    </plurals>
+    <plurals name="interval_prefix_years">
+        <item quantity="one">Jedes</item>
+        <item quantity="other">Alle</item>
+    </plurals>
+    <string name="on_these_days">An diesen Tagen</string>
+    <string name="on_day">Am Tag</string>
+    <string name="day_of_month">%d.</string>
+    <string name="day_of_month_what">Tag</string>
+    <string name="last_day_of_month">Letzter Tag des Monats</string>
+    <string name="short_month_hint">In kürzeren Monaten klingelt der Wecker am letzten Tag des Monats.</string>
+    <string name="which_in_month">Welcher im Monat</string>
+    <string name="weekday">Wochentag</string>
+    <string name="yearly_hint">Der Wecker klingelt jeweils am Tag und Monat des Startdatums.</string>
+    <string name="starts_on">Beginnt am</string>
+    <string name="interval_counted_from">%s – von hier aus wird das Intervall gezählt</string>
+    <string name="ends">Endet</string>
+    <string name="ends_after">Nach dem %s</string>
+    <string name="no_end">Kein Ende</string>
+    <string name="date">Datum</string>
+    <string name="next_time_reached">Nächstes Mal, wenn die Uhrzeit erreicht ist</string>
+    <string name="no_date">Kein Datum</string>
+    <string name="upcoming">Nächste Termine</string>
+
+    <string name="default_snooze">Standard-Schlummerdauer</string>
+    <string name="default_snooze_sub">%s – gilt für Wecker ohne eigene Dauer</string>
+    <string name="ring_for">Wecker verstummt nach</string>
+    <string name="ring_for_sub">%s ohne Reaktion – danach gibt es den Hinweis „Verpasster Wecker“</string>
+    <string name="ring_for_never_sub">Klingelt, bis du reagierst</string>
+    <string name="default_ramp">Standard für „Lauter werden“</string>
+    <string name="default_ramp_sub">%s – gilt für Wecker ohne eigene Einstellung</string>
+    <string name="ramp_dialog_title">Lautstärke langsam erhöhen</string>
+    <string name="flip_to_snooze">Umdrehen zum Schlummern</string>
+    <string name="flip_to_snooze_sub">Das Handy mit dem Display nach unten hinlegen schlummert einen klingelnden Wecker. Für erneutes Schlummern vorher einmal aufnehmen.</string>
+    <string name="reliability">Zuverlässigkeit</string>
+    <string name="all_set">Alles eingerichtet – Wecker klingeln auch im Ruhe- und Stromsparmodus.</string>
+    <string name="test_advice">Teste den Wecker am besten einmal bei gesperrtem Bildschirm und eingeschaltetem „Nicht stören“. Wichtig: „Stopp erzwingen“ in den App-Infos löscht alle geplanten Wecker, bis du die App wieder öffnest.</string>
+    <string name="test_alarm_label">Probewecker</string>
+    <string name="test_alarm_toast">Probewecker klingelt in 1 Minute – jetzt Bildschirm sperren</string>
+    <string name="test_alarm_button">Probewecker in 1 Minute</string>
+
+    <string name="ramp_off">Aus – sofort volle Lautstärke</string>
+    <plurals name="ramp_seconds">
+        <item quantity="one">In %d Sekunde lauter werden</item>
+        <item quantity="other">In %d Sekunden lauter werden</item>
+    </plurals>
+    <plurals name="ramp_minutes">
+        <item quantity="one">In %d Minute lauter werden</item>
+        <item quantity="other">In %d Minuten lauter werden</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d Minute</item>
+        <item quantity="other">%d Minuten</item>
+    </plurals>
+
+    <string name="default_sound">Standard-Weckton</string>
+    <string name="default_sound_named">Standard-Weckton (%s)</string>
+    <string name="builtin_sound">Eingebauter Piepton</string>
+    <string name="custom_file">Eigene Datei</string>
+    <string name="alarm_sounds">Wecktöne</string>
+    <string name="ringtones">Klingeltöne</string>
+    <string name="file_import_failed">Datei konnte nicht übernommen werden (zu groß oder nicht lesbar).</string>
+    <string name="file_importing">Datei wird übernommen …</string>
+    <string name="file_choose">Eigene Audiodatei wählen …</string>
+    <string name="sounds_loading">Lade Töne …</string>
+
+    <string name="channel_ringing">Klingelnder Wecker</string>
+    <string name="channel_ringing_desc">Zeigt den klingelnden Wecker an, auch auf dem Sperrbildschirm</string>
+    <string name="channel_emergency">Wecker (Notfall)</string>
+    <string name="channel_emergency_desc">Klingelt, falls der normale Weckton nicht gestartet werden kann</string>
+    <string name="channel_missed">Verpasste Wecker</string>
+    <string name="channel_missed_desc">Hinweis, wenn ein Wecker verpasst wurde oder ohne Reaktion verstummt ist</string>
+    <string name="emergency_text">Der normale Weckton konnte nicht starten.</string>
+    <string name="missed_title">Verpasster Wecker: %s</string>
+    <string name="missed_timeout">Nach %s ohne Reaktion verstummt</string>
+    <string name="missed_interrupted">Klingeln wurde vom System unterbrochen</string>
+    <string name="missed_replaced">Von einem weiteren Wecker abgelöst</string>
+    <string name="missed_not_fired">Nicht ausgelöst – Gerät aus oder Uhrzeit verstellt</string>
+
+    <string name="action_allow">Erlauben</string>
+    <string name="action_change">Ändern</string>
+    <string name="action_sounds">Töne</string>
+    <string name="action_storage">Speicher</string>
+    <string name="action_exception">Ausnahme</string>
+    <string name="issue_notifications_title">Benachrichtigungen sind aus</string>
+    <string name="issue_notifications_text">Ohne sie erscheint der klingelnde Wecker nicht auf dem Bildschirm.</string>
+    <string name="issue_fullscreen_title">Vollbildanzeige nicht erlaubt</string>
+    <string name="issue_fullscreen_text">Der Wecker kann dann nicht über dem Sperrbildschirm erscheinen.</string>
+    <string name="issue_exact_title">Genaue Wecker nicht erlaubt</string>
+    <string name="issue_exact_text">Ohne diese Berechtigung kann Android den Wecker verzögern.</string>
+    <string name="issue_volume_title">Weckerlautstärke steht auf 0</string>
+    <string name="issue_volume_text">Der Wecker würde nur vibrieren. Stell die Weckerlautstärke in den Toneinstellungen hoch.</string>
+    <string name="issue_dnd_silent_title">„Nicht stören“ steht auf „Lautlos“</string>
+    <string name="issue_dnd_silent_text">In diesem Modus lässt Android auch keine Wecker klingeln.</string>
+    <string name="issue_dnd_blocks_title">„Nicht stören“ blockiert Wecker</string>
+    <string name="issue_dnd_blocks_text">Erlaube im aktiven Ruhemodus die Kategorie „Wecker“.</string>
+    <string name="issue_restricted_title">Akku-Nutzung ist „Eingeschränkt“</string>
+    <string name="issue_restricted_text">Manche Hersteller blockieren den Wecker dann im Hintergrund. Sicherer ist „Optimiert“ oder „Nicht eingeschränkt“.</string>
+    <string name="issue_channel_title">Benachrichtigung „Klingelnder Wecker“ abgeschwächt</string>
+    <string name="issue_channel_text">Der klingelnde Wecker erscheint dann nicht auf dem Bildschirm. Stell die Kategorie wieder auf „Pop-up/Dringend“.</string>
+    <string name="issue_damaged_title">Gespeicherte Wecker waren beschädigt</string>
+    <string name="issue_damaged_text">Einige Wecker konnten nicht gelesen werden – bitte die Liste prüfen und fehlende Wecker neu anlegen. Bereits geplante klingeln trotzdem.</string>
+    <string name="issue_write_title">Wecker konnten nicht gespeichert werden</string>
+    <string name="issue_write_text">Vermutlich ist der Speicher voll. Nach einem Neustart fehlen sonst die letzten Änderungen.</string>
+    <string name="issue_battery_title">Akku-Optimierung ist aktiv</string>
+    <string name="issue_battery_text">Android selbst lässt Wecker trotzdem klingeln, manche Hersteller beenden die App aber im Hintergrund. Eine Ausnahme macht den Wecker auf solchen Geräten zuverlässiger.</string>
+
+    <string name="fmt_date">EEE, d. MMM</string>
+    <string name="fmt_date_year">EEE, d. MMM yyyy</string>
+    <string name="fmt_day_month">d. MMM</string>
+    <string name="until">in %s</string>
+    <string name="until_less_than_minute">in weniger als 1 Min.</string>
+    <plurals name="until_days">
+        <item quantity="one">%d Tag</item>
+        <item quantity="other">%d Tagen</item>
+    </plurals>
+    <plurals name="hours_short">
+        <item quantity="one">%d Std.</item>
+        <item quantity="other">%d Std.</item>
+    </plurals>
+    <plurals name="minutes_short">
+        <item quantity="one">%d Min.</item>
+        <item quantity="other">%d Min.</item>
+    </plurals>
+    <string name="list_separator">", "</string>
+    <string name="list_and">%1$s und %2$s</string>
+    <string name="every_day">Jeden Tag</string>
+    <string name="workdays">Mo.–Fr.</string>
+    <string-array name="weekdays_short">
+        <item>Mo</item>
+        <item>Di</item>
+        <item>Mi</item>
+        <item>Do</item>
+        <item>Fr</item>
+        <item>Sa</item>
+        <item>So</item>
+    </string-array>
+    <string-array name="weekdays_abbr">
+        <item>Mo.</item>
+        <item>Di.</item>
+        <item>Mi.</item>
+        <item>Do.</item>
+        <item>Fr.</item>
+        <item>Sa.</item>
+        <item>So.</item>
+    </string-array>
+    <string-array name="weekdays_long">
+        <item>Montag</item>
+        <item>Dienstag</item>
+        <item>Mittwoch</item>
+        <item>Donnerstag</item>
+        <item>Freitag</item>
+        <item>Samstag</item>
+        <item>Sonntag</item>
+    </string-array>
+    <string-array name="weekday_gender">
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+    </string-array>
+    <string-array name="ordinals_m">
+        <item>1.</item>
+        <item>2.</item>
+        <item>3.</item>
+        <item>4.</item>
+        <item>letzten</item>
+    </string-array>
+    <string-array name="ordinals_f">
+        <item>1.</item>
+        <item>2.</item>
+        <item>3.</item>
+        <item>4.</item>
+        <item>letzten</item>
+    </string-array>
+    <string-array name="ordinal_chips">
+        <item>1.</item>
+        <item>2.</item>
+        <item>3.</item>
+        <item>4.</item>
+        <item>Letzter</item>
+    </string-array>
+    <string name="weekday_group">%1$s %2$s</string>
+    <string name="desc_once">Einmalig</string>
+    <string name="desc_once_on">Einmalig, %s</string>
+    <string name="desc_daily">Täglich</string>
+    <string name="desc_every_n_days">Jeden %d. Tag</string>
+    <string name="desc_every_n_weeks">Jede %1$d. Woche: %2$s</string>
+    <string name="desc_monthly_on_day">Monatlich am %d.</string>
+    <string name="desc_monthly_last_day">Monatlich am letzten Tag</string>
+    <string name="desc_every_n_months_on_day">Jeden %1$d. Monat am %2$d.</string>
+    <string name="desc_every_n_months_last_day">Jeden %d. Monat am letzten Tag</string>
+    <string name="desc_monthly_weekday">Jeden %s im Monat</string>
+    <string name="desc_every_n_months_weekday">Jeden %1$d. Monat am %2$s</string>
+    <string name="desc_yearly">Jährlich am %s</string>
+    <string name="desc_every_n_years">Jedes %1$d. Jahr am %2$s</string>
+    <string name="desc_with_end">%1$s · bis %2$s</string>
+
+    <string name="help_repeat_title">Wiederkehrende Wecker</string>
+    <string name="help_repeat_text">Tippe bei einem Wecker auf die Wiederholung, um eine Regel zu wählen:\n• Einmalig – an einem Datum oder beim nächsten Erreichen der Uhrzeit\n• Alle n Tage – z. B. jeden 3. Tag\n• Alle n Wochen an bestimmten Wochentagen – z. B. jede 2. Woche Montag und Donnerstag\n• Monatlich an einem Tag – z. B. am 15. oder am letzten Tag\n• Monatlich an einem Wochentag – z. B. am 1. und 3. Donnerstag oder am letzten Freitag\n• Jährlich\nJede Regel kann ein Enddatum haben. Die Vorschau zeigt die nächsten Termine.\nDie Wochentagskreise auf der Karte funktionieren wie bei der Android-Uhr.</string>
+    <string name="help_timetable_title">Wechselnde Wochen und Stundenpläne</string>
+    <string name="help_timetable_text">Für einen Rhythmus, der von Woche zu Woche wechselt – A/B-Wochen in der Schule, Früh- und Spätschicht, Stundenplan an der Uni –, legst du je Muster einen Wecker mit „Alle 2 Wochen“ an, z. B. 6:00 Uhr Mo.–Mi. und 8:30 Uhr Do.–Fr.\nWelche Woche zählt, bestimmt das Startdatum: Ab der Woche des Startdatums wird das Intervall gezählt. Für die andere Woche bekommt ein zweiter Wecker ein Startdatum eine Woche später.\nAuch längere Zyklen gehen, z. B. alle 3 oder 4 Wochen.</string>
+    <string name="help_pause_title">Aussetzen</string>
+    <string name="help_pause_text">Wiederkehrende Wecker lassen sich aussetzen – z. B. im Urlaub. Wähle Tage, Wochen oder Monate ab heute, eine Anzahl Termine, die ausfallen sollen, oder ein letztes Datum. Der Dialog zeigt, welche Termine entfallen. Danach klingelt der Wecker von selbst wieder.</string>
+    <string name="help_ringing_title">Schlummern, Lautstärke und Ton</string>
+    <string name="help_ringing_text">Schlummerdauer und „Lauter werden“ lassen sich pro Wecker oder als Standard in den Einstellungen festlegen. Ein klingelnder Wecker verstummt nach der in den Einstellungen gewählten Zeit von selbst und meldet sich dann als „Verpasster Wecker“.\nAls Ton gehen die Weck- und Klingeltöne des Geräts oder eine eigene Audiodatei. Eigene Dateien werden in die App kopiert, damit sie auch nach einem Neustart sicher abspielbar sind.</string>
+    <string name="help_reliability_title">Zuverlässigkeit</string>
+    <string name="help_reliability_text">Wecker nutzen die Weckerfunktion von Android und klingeln im Ruhe- und Stromsparmodus und bei „Nicht stören“ (wenn Wecker dort erlaubt sind). Nach einem Neustart funktionieren sie schon vor dem ersten Entsperren.\nDie App prüft Berechtigungen, Weckerlautstärke und „Nicht stören“ und zeigt Warnungen in der Liste und in den Einstellungen.\nWichtig: „Stopp erzwingen“ in den App-Infos löscht alle geplanten Wecker, bis du die App wieder öffnest.\nKann der normale Ton nicht starten, klingelt ersatzweise ein Notfall-Wecker mit Benachrichtigung. Konnte ein Wecker nicht klingeln (Gerät aus, Uhrzeit verstellt), gibt es den Hinweis „Verpasster Wecker“.\nTipp: Probier den Probewecker in den Einstellungen einmal bei gesperrtem Bildschirm aus.</string>
+    <string name="help_flip_title">Umdrehen zum Schlummern</string>
+    <string name="help_flip_text">Klingelt ein Wecker, leg das Handy mit dem Display nach unten hin – dann schlummert er. Nach der Schlummerzeit klingelt er wieder. Liegt das Handy noch umgedreht da, nimm es kurz auf und leg es wieder hin – oder tippe auf „Schlummern“. Der Bewegungssensor läuft nur, solange ein Wecker klingelt. Abschalten lässt sich das in den Einstellungen.</string>
+    <string name="help_privacy_title">Datenschutz</string>
+    <string name="help_privacy_text">Die App hat keine Internet-Berechtigung. Alle Wecker bleiben auf deinem Gerät.</string>
+    <string name="help_about_title">Über die App</string>
+    <string name="help_about_text">Version %1$s\nFreie Software unter der GNU General Public License v3.0.\nQuellcode und Fehlermeldungen: %2$s</string>
+</resources>

@@ -1,5 +1,8 @@
 package com.andik.wecker.ui
 
+import androidx.compose.ui.res.pluralStringResource
+import com.andik.wecker.R
+import androidx.compose.ui.res.stringResource
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -107,7 +110,7 @@ private fun RingingScreen(label: String, snoozeMinutes: Int, onSnooze: (() -> Un
             Spacer(Modifier.weight(1f))
             Text(Format.time(now), fontSize = 88.sp, color = MaterialTheme.colorScheme.onSurface)
             Text(
-                label.ifBlank { "Wecker" },
+                label.ifBlank { stringResource(R.string.alarm_default_label) },
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -115,15 +118,15 @@ private fun RingingScreen(label: String, snoozeMinutes: Int, onSnooze: (() -> Un
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
                 if (onSnooze != null) {
                     FilledTonalButton(onClick = onSnooze, modifier = Modifier.weight(1f).height(72.dp)) {
-                        Icon(Icons.Filled.Snooze, null, Modifier.size(24.dp))
+                        Icon(Icons.Filled.Snooze, stringResource(R.string.snooze), Modifier.size(24.dp))
                         Spacer(Modifier.size(8.dp))
-                        Text("$snoozeMinutes Min.", style = MaterialTheme.typography.titleMedium)
+                        Text(pluralStringResource(R.plurals.minutes_short, snoozeMinutes, snoozeMinutes), style = MaterialTheme.typography.titleMedium)
                     }
                 }
                 Button(onClick = onDismiss, modifier = Modifier.weight(1f).height(72.dp)) {
                     Icon(Icons.Filled.AlarmOff, null, Modifier.size(24.dp))
                     Spacer(Modifier.size(8.dp))
-                    Text("Beenden", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.dismiss), style = MaterialTheme.typography.titleMedium)
                 }
             }
             Spacer(Modifier.height(24.dp))

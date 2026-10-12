@@ -1,5 +1,6 @@
 package com.andik.wecker.alarm
 
+import com.andik.wecker.data.SoundFiles
 import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
@@ -32,12 +33,11 @@ object EmergencyAlarm {
 
     private fun createChannel(context: Context) {
         val nm = context.getSystemService(NotificationManager::class.java)
-        if (nm.getNotificationChannel(CHANNEL_ID) != null) return
         nm.createNotificationChannel(
-            NotificationChannel(CHANNEL_ID, "Wecker (Notfall)", NotificationManager.IMPORTANCE_HIGH).apply {
-                description = "Klingelt, falls der normale Weckton nicht gestartet werden kann"
+            NotificationChannel(CHANNEL_ID, context.getString(R.string.channel_emergency), NotificationManager.IMPORTANCE_HIGH).apply {
+                description = context.getString(R.string.channel_emergency_desc)
                 setSound(
-                    Uri.parse("android.resource://${context.packageName}/${R.raw.fallback_alarm}"),
+                    Uri.parse(SoundFiles.builtinUri(context)),
                     AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM)
                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build(),
                 )
@@ -71,12 +71,14 @@ object EmergencyAlarm {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         val ringMinutes = AlarmStore.settings.value.ringMinutes
-        val title = alarm.label.ifBlank { "Wecker" } + " – " + Format.time(alarm.hour, alarm.minute)
+        val title = runCatching {
+            alarm.label.ifBlank { context.getString(R.string.alarm_default_label) } + " – " + Format.time(alarm.hour, alarm.minute)
+        }.getOrDefault(alarm.label.ifBlank { "⏰" })
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_alarm)
             .setContentTitle(title)
-            .setContentText("Der normale Weckton konnte nicht starten.")
-            .addAction(0, "Beenden", stop)
+            .setContentText(context.getString(R.string.emergency_text))
+            .addAction(0, context.getString(R.string.dismiss), stop)
             .apply { if (ringMinutes > 0) setTimeoutAfter(ringMinutes * 60_000L) }
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setPriority(NotificationCompat.PRIORITY_MAX)

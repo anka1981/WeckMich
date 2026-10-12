@@ -1,0 +1,31 @@
+<p><b>Un réveil qui suit ton rythme – même quand il change d'une semaine à l'autre.</b></p>
+
+<p>Semaines A/B à l'école, équipes du matin et du soir, emploi du temps à la fac différent une semaine sur deux : avec Réveille-moi, tu règles chaque alarme une seule fois avec une règle flexible, et elle sonne tout simplement les bons jours. Fini d'activer et de désactiver des alarmes chaque dimanche soir.</p>
+
+<p><b>Des règles que l'horloge intégrée ne sait pas faire</b></p>
+<ul>
+<li><b>Toutes les n semaines</b> certains jours – p. ex. le lundi et le jeudi une semaine sur deux ; la date de début détermine quelle semaine compte</li>
+<li><b>Chaque mois un jour de la semaine</b> – p. ex. le 1er mardi, le 1er et le 3e jeudi ou le dernier vendredi du mois</li>
+<li><b>Chaque mois à une date</b> – p. ex. le 15 ou le dernier jour du mois</li>
+<li>Tous les n jours, chaque année ou une seule fois – chacune avec une date de début et une date de fin facultative</li>
+</ul>
+<p>Un aperçu montre les prochaines occurrences, pour voir d'un coup d'œil si la règle est correcte.</p>
+
+<p><b>Suspendre au lieu de supprimer</b><br/>
+Tu pars en vacances ? Suspends les alarmes récurrentes pendant des jours, des semaines ou des mois, pour un nombre d'occurrences ou jusqu'à une date. L'appli indique quelles occurrences sont annulées et reprend toute seule ensuite.</p>
+
+<p><b>Le réveil</b></p>
+<ul>
+<li>Retourner le téléphone pour répéter (snooze)</li>
+<li>Durée de répétition et volume progressif par alarme ou par défaut</li>
+<li>Sons d'alarme, sonneries de l'appareil ou ton propre fichier audio</li>
+<li>Sonne de manière fiable en mode Doze, avec l'économiseur de batterie et en mode Ne pas déranger, et après un redémarrage même avant le premier déverrouillage</li>
+<li>Vérifie les autorisations, le volume des alarmes et Ne pas déranger, et t'avertit de tout ce qui empêcherait l'alarme de sonner</li>
+<li>Avis « Alarme manquée » si l'appareil était éteint ou si l'alarme s'est arrêtée sans réaction</li>
+<li>Alarme test dans 1 minute</li>
+</ul>
+
+<p><b>Confidentialité</b><br/>
+Pas d'autorisation Internet, pas de publicité, pas de pistage. Tes alarmes restent sur ton appareil.</p>
+
+<p>Disponible en anglais, allemand, français, espagnol, italien, portugais et néerlandais ; l'appli suit la langue du système.</p>

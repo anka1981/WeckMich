@@ -1,5 +1,6 @@
 package com.andik.wecker.model
 
+import com.andik.wecker.R
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -143,12 +144,13 @@ data class Alarm(
     }
 }
 
-enum class PauseUnit(val one: String, val many: String, val max: Int) {
-    DAYS("Tag", "Tage", 365),
-    WEEKS("Woche", "Wochen", 52),
-    MONTHS("Monat", "Monate", 24),
+/** [label] ist die Plural-Ressource für die Einheit („Woche“/„Wochen“). */
+enum class PauseUnit(val label: Int, val max: Int) {
+    DAYS(R.plurals.unit_days, 365),
+    WEEKS(R.plurals.unit_weeks, 52),
+    MONTHS(R.plurals.unit_months, 24),
     /** Die nächsten n Termine auslassen – kein Kalenderzeitraum, siehe [Alarm.resumeAfterSkipping]. */
-    OCCURRENCES("Termin", "Termine", 99);
+    OCCURRENCES(R.plurals.unit_occurrences, 99);
 
     /** Wiederbeginn für einen Kalenderzeitraum ab [from]; nicht für [OCCURRENCES]. */
     fun plus(from: LocalDate, amount: Int): LocalDate = when (this) {
@@ -168,4 +170,6 @@ data class Settings(
     val ringMinutes: Int = 10,
     /** Sekunden, über die die Lautstärke ansteigt; 0 = sofort volle Lautstärke. */
     val rampSeconds: Int = 0,
+    /** Display nach unten drehen schlummert einen klingelnden Wecker. */
+    val flipToSnooze: Boolean = true,
 )

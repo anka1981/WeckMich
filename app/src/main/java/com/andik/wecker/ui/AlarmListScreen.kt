@@ -1,5 +1,9 @@
 package com.andik.wecker.ui
 
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import com.andik.wecker.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.Role
@@ -96,8 +100,8 @@ fun saveAndAnnounce(context: Context, alarm: Alarm) {
     val at = Alarms.save(context, alarm)
     val msg = when {
         !alarm.enabled -> return
-        at == null -> "Für diese Regel gibt es keinen weiteren Termin"
-        else -> "Wecker klingelt ${Format.until(at, System.currentTimeMillis())}"
+        at == null -> context.getString(R.string.no_further_occurrence)
+        else -> context.getString(R.string.alarm_rings_in, Format.until(at, System.currentTimeMillis()))
     }
     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
 }
@@ -138,7 +142,7 @@ fun Recurrence.selectedDays(): Set<DayOfWeek> = when (type) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AlarmListScreen(onOpenSettings: () -> Unit) {
+fun AlarmListScreen(onOpenSettings: () -> Unit, onOpenHelp: () -> Unit) {
     val context = LocalContext.current
     val alarms by AlarmStore.alarms.collectAsState()
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
@@ -165,12 +169,15 @@ fun AlarmListScreen(onOpenSettings: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Wecker") },
-                actions = { IconButton(onClick = onOpenSettings) { Icon(Icons.Filled.Settings, "Einstellungen") } },
+                title = { Text(stringResource(R.string.alarms_title)) },
+                actions = {
+                    IconButton(onClick = onOpenHelp) { Icon(Icons.AutoMirrored.Filled.HelpOutline, stringResource(R.string.help)) }
+                    IconButton(onClick = onOpenSettings) { Icon(Icons.Filled.Settings, stringResource(R.string.settings)) }
+                },
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { createNew = true }) { Icon(Icons.Filled.Add, "Wecker hinzufügen") }
+            FloatingActionButton(onClick = { createNew = true }) { Icon(Icons.Filled.Add, stringResource(R.string.add_alarm)) }
         },
         floatingActionButtonPosition = FabPosition.Center,
     ) { padding ->
@@ -186,7 +193,7 @@ fun AlarmListScreen(onOpenSettings: () -> Unit) {
             if (alarms.isEmpty()) {
                 item {
                     Box(Modifier.fillMaxWidth().padding(top = 96.dp), contentAlignment = Alignment.Center) {
-                        Text("Noch keine Wecker", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.no_alarms), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -222,11 +229,11 @@ private fun RingingBanner(alarm: Alarm) {
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
         Row(Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                "Klingelt: ${alarm.label.ifBlank { "Wecker" }} ${Format.time(alarm.hour, alarm.minute)}",
+                stringResource(R.string.ringing_banner, alarm.label.ifBlank { stringResource(R.string.alarm_default_label) }, Format.time(alarm.hour, alarm.minute)),
                 Modifier.weight(1f), fontWeight = FontWeight.SemiBold,
             )
-            TextButton(onClick = { AlarmService.send(context, AlarmService.ACTION_SNOOZE) }) { Text("Schlummern") }
-            TextButton(onClick = { AlarmService.send(context, AlarmService.ACTION_DISMISS) }) { Text("Beenden") }
+            TextButton(onClick = { AlarmService.send(context, AlarmService.ACTION_SNOOZE) }) { Text(stringResource(R.string.snooze)) }
+            TextButton(onClick = { AlarmService.send(context, AlarmService.ACTION_DISMISS) }) { Text(stringResource(R.string.dismiss)) }
         }
     }
 }
@@ -248,7 +255,7 @@ fun IssueCard(issue: Issue) {
             if (issue.intent != null && issue.action != null) {
                 TextButton(onClick = {
                     runCatching { context.startActivity(issue.intent) }.onFailure {
-                        Toast.makeText(context, "Einstellung konnte nicht geöffnet werden", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.setting_open_failed, Toast.LENGTH_SHORT).show()
                     }
                 }) { Text(issue.action) }
             }
@@ -276,6 +283,7 @@ private fun AlarmCard(
     var editRamp by rememberSaveable { mutableStateOf(false) }
     var editPause by rememberSaveable { mutableStateOf(false) }
     val defaults by AlarmStore.settings.collectAsState()
+    val switchLabel = stringResource(R.string.alarm_switch, Format.time(alarm.hour, alarm.minute))
 
     Card(
         modifier = Modifier.animateContentSize(),
@@ -292,11 +300,11 @@ private fun AlarmCard(
                     fontSize = 52.sp,
                     fontWeight = FontWeight.Light,
                     color = if (active) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                    modifier = Modifier.clickable(onClickLabel = "Uhrzeit ändern") { editTime = true },
+                    modifier = Modifier.clickable(onClickLabel = stringResource(R.string.change_time)) { editTime = true },
                 )
                 Spacer(Modifier.weight(1f))
                 Switch(
-                    modifier = Modifier.semantics { contentDescription = "Wecker ${Format.time(alarm.hour, alarm.minute)}" },
+                    modifier = Modifier.semantics { contentDescription = switchLabel },
                     checked = alarm.enabled, onCheckedChange = {
                     saveAndAnnounce(context, alarm.copy(enabled = it, snoozeUntil = null, temporary = false).let { a -> if (it) a.rearmed() else a })
                 })
@@ -309,7 +317,7 @@ private fun AlarmCard(
                     }
                     NextLine(alarm, now)
                 }
-                Icon(if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, if (expanded) "Zuklappen" else "Aufklappen")
+                Icon(if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, stringResource(if (expanded) R.string.collapse else R.string.expand))
             }
 
             if (expanded) {
@@ -321,36 +329,36 @@ private fun AlarmCard(
                     }
                 }
                 Spacer(Modifier.size(4.dp))
-                DetailRow(Icons.Filled.Repeat, "Wiederholung", Format.describe(alarm.recurrence, today)) { editRecurrence = true }
+                DetailRow(Icons.Filled.Repeat, stringResource(R.string.repeat), Format.describe(alarm.recurrence, today)) { editRecurrence = true }
                 if (alarm.recurrence.isRepeating) {
-                    DetailRow(Icons.Filled.PauseCircle, "Aussetzen", pauseText(alarm, today) ?: "Für Tage, Wochen oder Monate pausieren") {
+                    DetailRow(Icons.Filled.PauseCircle, stringResource(R.string.pause), pauseText(alarm, today) ?: stringResource(R.string.pause_hint)) {
                         editPause = true
                     }
                 }
-                DetailRow(Icons.AutoMirrored.Filled.Label, "Label", alarm.label.ifBlank { "Hinzufügen" }) { editLabel = true }
-                DetailRow(Icons.Filled.MusicNote, "Weckton", alarm.ringtoneName ?: "Standard-Weckton") { editSound = true }
+                DetailRow(Icons.AutoMirrored.Filled.Label, stringResource(R.string.label), alarm.label.ifBlank { stringResource(R.string.label_add) }) { editLabel = true }
+                DetailRow(Icons.Filled.MusicNote, stringResource(R.string.sound), soundName(context, alarm.ringtone, alarm.ringtoneName)) { editSound = true }
                 DetailRow(
-                    Icons.Filled.Snooze, "Schlummern",
-                    alarm.snoozeMinutes?.let { "$it Minuten" } ?: "Standard (${defaults.snoozeMinutes} Minuten)",
+                    Icons.Filled.Snooze, stringResource(R.string.snooze),
+                    alarm.snoozeMinutes?.let(Format::minutes) ?: stringResource(R.string.default_value, Format.minutes(defaults.snoozeMinutes)),
                 ) { editSnooze = true }
                 DetailRow(
-                    Icons.AutoMirrored.Filled.VolumeUp, "Lauter werden",
-                    alarm.rampSeconds?.let(Format::ramp) ?: "Standard (${Format.ramp(defaults.rampSeconds)})",
+                    Icons.AutoMirrored.Filled.VolumeUp, stringResource(R.string.ramp_title),
+                    alarm.rampSeconds?.let(Format::ramp) ?: stringResource(R.string.default_value, Format.ramp(defaults.rampSeconds)),
                 ) { editRamp = true }
                 Row(
-                    Modifier.fillMaxWidth().clickable { Alarms.save(context, alarm.copy(vibrate = !alarm.vibrate)) },
+                    Modifier.fillMaxWidth().toggleable(alarm.vibrate, role = Role.Checkbox) { Alarms.save(context, alarm.copy(vibrate = it)) },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(Icons.Filled.Vibration, null, Modifier.padding(end = 16.dp))
-                    Text("Vibrieren", Modifier.weight(1f))
-                    Checkbox(checked = alarm.vibrate, onCheckedChange = { Alarms.save(context, alarm.copy(vibrate = it)) })
+                    Text(stringResource(R.string.vibrate), Modifier.weight(1f))
+                    Checkbox(checked = alarm.vibrate, onCheckedChange = null)
                 }
                 Row(
                     Modifier.fillMaxWidth().clickable(onClick = onDelete).padding(vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(Icons.Filled.Delete, null, Modifier.padding(end = 16.dp), tint = MaterialTheme.colorScheme.error)
-                    Text("Löschen", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.delete), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.error)
                 }
             }
         }
@@ -376,20 +384,22 @@ private fun AlarmCard(
         }
     }
     if (editSnooze) {
+        val defaultLabel = stringResource(R.string.default_value, Format.minutes(defaults.snoozeMinutes))
         OptionDialog(
-            title = "Schlummerdauer",
+            title = stringResource(R.string.snooze_length),
             options = listOf<Int?>(null) + SNOOZE_CHOICES,
             selected = alarm.snoozeMinutes,
-            label = { v -> v?.let { "$it Minuten" } ?: "Standard (${defaults.snoozeMinutes} Minuten)" },
+            label = { v -> v?.let(Format::minutes) ?: defaultLabel },
             onDismiss = { editSnooze = false },
         ) { Alarms.save(context, alarm.copy(snoozeMinutes = it)) }
     }
     if (editRamp) {
+        val defaultLabel = stringResource(R.string.default_value, Format.ramp(defaults.rampSeconds))
         OptionDialog(
-            title = "Lauter werden",
+            title = stringResource(R.string.ramp_title),
             options = listOf<Int?>(null) + RAMP_CHOICES,
             selected = alarm.rampSeconds,
-            label = { v -> v?.let(Format::ramp) ?: "Standard (${Format.ramp(defaults.rampSeconds)})" },
+            label = { v -> v?.let(Format::ramp) ?: defaultLabel },
             onDismiss = { editRamp = false },
         ) { Alarms.save(context, alarm.copy(rampSeconds = it)) }
     }
@@ -417,15 +427,15 @@ private fun AlarmCard(
         var text by rememberSaveable { mutableStateOf(alarm.label) }
         AlertDialog(
             onDismissRequest = { editLabel = false },
-            title = { Text("Label") },
-            text = { OutlinedTextField(text, { text = it }, singleLine = true, placeholder = { Text("z. B. Biomüll") }) },
+            title = { Text(stringResource(R.string.label)) },
+            text = { OutlinedTextField(text, { text = it }, singleLine = true, placeholder = { Text(stringResource(R.string.label_placeholder)) }) },
             confirmButton = {
                 TextButton(onClick = {
                     editLabel = false
                     Alarms.save(context, alarm.copy(label = text.trim()))
-                }) { Text("OK") }
+                }) { Text(stringResource(R.string.ok)) }
             },
-            dismissButton = { TextButton(onClick = { editLabel = false }) { Text("Abbrechen") } },
+            dismissButton = { TextButton(onClick = { editLabel = false }) { Text(stringResource(R.string.cancel)) } },
         )
     }
 }
@@ -437,9 +447,9 @@ private fun NextLine(alarm: Alarm, now: Long) {
     val text = when {
         snooze != null && snooze == next -> {
             val t = Instant.ofEpochMilli(snooze).atZone(ZoneId.systemDefault())
-            "Schlummert bis ${Format.time(t)}"
+            stringResource(R.string.snoozing_until, Format.time(t))
         }
-        next == null && alarm.enabled -> "Keine weiteren Termine"
+        next == null && alarm.enabled -> stringResource(R.string.no_more_occurrences)
         next == null -> return
         else -> {
             val t = Instant.ofEpochMilli(next).atZone(ZoneId.systemDefault())
@@ -460,7 +470,7 @@ private fun DayCircles(selected: Set<DayOfWeek>, onToggle: (DayOfWeek) -> Unit) 
                 contentColor = if (on) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(38.dp).clip(CircleShape)
                     .toggleable(value = on, role = Role.Checkbox) { onToggle(d) }
-                    .semantics { contentDescription = Format.longDay(d) },
+                    .clearAndSetSemantics { contentDescription = Format.longDay(d) },
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(Format.shortDay(d), style = MaterialTheme.typography.labelLarge)

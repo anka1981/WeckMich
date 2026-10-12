@@ -1,0 +1,1 @@
+Première version sur F-Droid : disponible en anglais, allemand, français, espagnol, italien, portugais et néerlandais (suit la langue du système), nouvelle page d'aide, retourner le téléphone pour répéter, les heures suivent le réglage 12/24 heures.

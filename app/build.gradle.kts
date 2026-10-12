@@ -14,13 +14,16 @@ val keystoreProperties = Properties().apply {
 android {
     namespace = "com.andik.wecker"
     compileSdk = 37
+    // Für reproduzierbare Builds (F-Droid vergleicht seinen Nachbau mit der hier signierten APK)
+    // muss die Build-Tools-Version fest vorgegeben sein.
+    buildToolsVersion = "36.0.0"
 
     defaultConfig {
-        applicationId = "com.andik.wecker"
+        applicationId = "io.github.anka1981.weckmich"
         minSdk = 26
         targetSdk = 37
-        versionCode = 7
-        versionName = "1.5"
+        versionCode = 8
+        versionName = "1.6"
     }
 
     signingConfigs {
@@ -47,7 +50,22 @@ android {
             if (keystorePropertiesFile.exists()) {
                 signingConfig = signingConfigs.getByName("release")
             }
+            // Enthielte Pfad und Git-Revision und unterschiede jeden Nachbau vom lokal gebauten APK.
+            vcsInfo {
+                include = false
+            }
         }
+    }
+
+    // Google-Abhängigkeitsinfo nicht in den Signaturblock schreiben (nicht reproduzierbar, F-Droid lehnt sie ab).
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
+    androidResources {
+        // Sprachauswahl pro App (Android 13+) aus den vorhandenen Übersetzungen.
+        generateLocaleConfig = true
     }
 
     compileOptions {

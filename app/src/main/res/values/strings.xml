@@ -1,3 +1,348 @@
-<resources>
-    <string name="app_name">Weck mich</string>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- PluralsCandidate: Diese Muster stehen nur für Zahlen ab 2. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="PluralsCandidate">
+    <string name="app_name">Wake Me</string>
+
+    <!-- Allgemein -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="done">Done</string>
+    <string name="back">Back</string>
+    <string name="alarm_default_label">Alarm</string>
+    <string name="snooze">Snooze</string>
+    <string name="dismiss">Stop</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="never">Never</string>
+    <string name="time">Time</string>
+    <string name="decrease">Decrease %s</string>
+    <string name="increase">Increase %s</string>
+
+    <!-- Weckerliste -->
+    <string name="alarms_title">Alarms</string>
+    <string name="settings">Settings</string>
+    <string name="help">Help</string>
+    <string name="add_alarm">Add alarm</string>
+    <string name="no_alarms">No alarms yet</string>
+    <string name="no_further_occurrence">This rule has no further occurrence</string>
+    <string name="alarm_rings_in">Alarm goes off %s</string>
+    <string name="ringing_banner">Ringing: %1$s %2$s</string>
+    <string name="setting_open_failed">Could not open the setting</string>
+    <string name="change_time">Change time</string>
+    <string name="alarm_switch">Alarm %s</string>
+    <string name="expand">Expand</string>
+    <string name="collapse">Collapse</string>
+    <string name="repeat">Repeat</string>
+    <string name="pause">Pause</string>
+    <string name="pause_hint">Pause for days, weeks or months</string>
+    <string name="label">Label</string>
+    <string name="label_add">Add</string>
+    <string name="label_placeholder">e.g. Bin day</string>
+    <string name="sound">Alarm sound</string>
+    <string name="default_value">Default (%s)</string>
+    <string name="ramp_title">Gradually louder</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="delete">Delete</string>
+    <string name="snooze_length">Snooze length</string>
+    <string name="snoozing_until">Snoozing until %s</string>
+    <string name="no_more_occurrences">No further occurrences</string>
+
+    <!-- Aussetzen -->
+    <string name="paused_through">Paused through %s</string>
+    <string name="skipped_none">No occurrence is skipped.</string>
+    <plurals name="skipped">
+        <item quantity="one">%1$d occurrence is skipped: %2$s</item>
+        <item quantity="other">%1$d occurrences are skipped: %2$s</item>
+    </plurals>
+    <plurals name="skipped_more">
+        <item quantity="one">and %d more</item>
+        <item quantity="other">and %d more</item>
+    </plurals>
+    <string name="next_occurrence">Next occurrence: %1$s, %2$s</string>
+    <string name="no_occurrence_after">There are no occurrences after that.</string>
+    <string name="pause_title">Pause alarm</string>
+    <string name="pause_current">Current</string>
+    <string name="pause_end">End pause</string>
+    <string name="pause_heading_period">Pause starting today for</string>
+    <string name="pause_heading_occurrences">Skip the next occurrences:</string>
+    <string name="pause_heading_replace_period">New pause (replaces the current one) – starting today for</string>
+    <string name="pause_heading_replace_occurrences">New pause (replaces the current one) – skip the next occurrences:</string>
+    <string name="pause_count">number</string>
+    <string name="pause_preview">Paused through %s</string>
+    <string name="pause_until_date">Instead, through a date …</string>
+    <string name="pause_replace">Replace pause</string>
+    <string name="pause_confirm">Pause</string>
+    <plurals name="unit_days">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <plurals name="unit_weeks">
+        <item quantity="one">week</item>
+        <item quantity="other">weeks</item>
+    </plurals>
+    <plurals name="unit_months">
+        <item quantity="one">month</item>
+        <item quantity="other">months</item>
+    </plurals>
+    <plurals name="unit_years">
+        <item quantity="one">year</item>
+        <item quantity="other">years</item>
+    </plurals>
+    <plurals name="unit_occurrences">
+        <item quantity="one">occurrence</item>
+        <item quantity="other">occurrences</item>
+    </plurals>
+
+    <!-- Wiederholung -->
+    <string name="type_once">Once</string>
+    <string name="type_daily">Daily / every n days</string>
+    <string name="type_weekly">Weekly / every n weeks</string>
+    <string name="type_monthly_day">Monthly on a day</string>
+    <string name="type_monthly_weekday">Monthly on a weekday</string>
+    <string name="type_yearly">Yearly</string>
+    <string name="hint_once">Goes off one time</string>
+    <string name="hint_daily">e.g. every 3rd day</string>
+    <string name="hint_weekly">e.g. every other week on Mondays – alternating weeks, shift or school timetables</string>
+    <string name="hint_monthly_day">e.g. on the 15th or on the last day</string>
+    <string name="hint_monthly_weekday">e.g. on the first Tuesday of the month</string>
+    <string name="hint_yearly">e.g. every year on Oct 8</string>
+    <string name="interval">Interval</string>
+    <plurals name="interval_prefix_days">
+        <item quantity="one">Every</item>
+        <item quantity="other">Every</item>
+    </plurals>
+    <plurals name="interval_prefix_weeks">
+        <item quantity="one">Every</item>
+        <item quantity="other">Every</item>
+    </plurals>
+    <plurals name="interval_prefix_months">
+        <item quantity="one">Every</item>
+        <item quantity="other">Every</item>
+    </plurals>
+    <plurals name="interval_prefix_years">
+        <item quantity="one">Every</item>
+        <item quantity="other">Every</item>
+    </plurals>
+    <string name="on_these_days">On these days</string>
+    <string name="on_day">On day</string>
+    <string name="day_of_month">%d</string>
+    <string name="day_of_month_what">day</string>
+    <string name="last_day_of_month">Last day of the month</string>
+    <string name="short_month_hint">In shorter months the alarm goes off on the last day of the month.</string>
+    <string name="which_in_month">Which one in the month</string>
+    <string name="weekday">Weekday</string>
+    <string name="yearly_hint">The alarm goes off every year on the day and month of the start date.</string>
+    <string name="starts_on">Starts on</string>
+    <string name="interval_counted_from">%s – the interval is counted from here</string>
+    <string name="ends">Ends</string>
+    <string name="ends_after">After %s</string>
+    <string name="no_end">No end</string>
+    <string name="date">Date</string>
+    <string name="next_time_reached">The next time this time of day comes round</string>
+    <string name="no_date">No date</string>
+    <string name="upcoming">Upcoming</string>
+
+    <!-- Einstellungen -->
+    <string name="default_snooze">Default snooze length</string>
+    <string name="default_snooze_sub">%s – for alarms without their own length</string>
+    <string name="ring_for">Alarm stops after</string>
+    <string name="ring_for_sub">%s without a response – then you get a “Missed alarm” notice</string>
+    <string name="ring_for_never_sub">Rings until you respond</string>
+    <string name="default_ramp">Default for “Gradually louder”</string>
+    <string name="default_ramp_sub">%s – for alarms without their own setting</string>
+    <string name="ramp_dialog_title">Gradually increase volume</string>
+    <string name="flip_to_snooze">Turn over to snooze</string>
+    <string name="flip_to_snooze_sub">Placing the phone face down snoozes a ringing alarm. To snooze again later, pick it up first.</string>
+    <string name="reliability">Reliability</string>
+    <string name="all_set">All set – alarms go off even in Do Not Disturb and battery saver.</string>
+    <string name="test_advice">Best test the alarm once with the screen locked and Do Not Disturb turned on. Important: “Force stop” in the app info deletes all scheduled alarms until you open the app again.</string>
+    <string name="test_alarm_label">Test alarm</string>
+    <string name="test_alarm_toast">Test alarm goes off in 1 minute – lock the screen now</string>
+    <string name="test_alarm_button">Test alarm in 1 minute</string>
+
+    <!-- Lautstärke -->
+    <string name="ramp_off">Off – full volume immediately</string>
+    <plurals name="ramp_seconds">
+        <item quantity="one">Get louder over %d second</item>
+        <item quantity="other">Get louder over %d seconds</item>
+    </plurals>
+    <plurals name="ramp_minutes">
+        <item quantity="one">Get louder over %d minute</item>
+        <item quantity="other">Get louder over %d minutes</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+
+    <!-- Töne -->
+    <string name="default_sound">Default alarm sound</string>
+    <string name="default_sound_named">Default alarm sound (%s)</string>
+    <string name="builtin_sound">Built-in beep</string>
+    <string name="custom_file">Custom file</string>
+    <string name="alarm_sounds">Alarm sounds</string>
+    <string name="ringtones">Ringtones</string>
+    <string name="file_import_failed">The file could not be used (too large or not readable).</string>
+    <string name="file_importing">Importing file …</string>
+    <string name="file_choose">Choose your own audio file …</string>
+    <string name="sounds_loading">Loading sounds …</string>
+
+    <!-- Benachrichtigungen -->
+    <string name="channel_ringing">Ringing alarm</string>
+    <string name="channel_ringing_desc">Shows the ringing alarm, also on the lock screen</string>
+    <string name="channel_emergency">Alarm (emergency)</string>
+    <string name="channel_emergency_desc">Rings if the normal alarm sound cannot be started</string>
+    <string name="channel_missed">Missed alarms</string>
+    <string name="channel_missed_desc">Notice when an alarm was missed or stopped without a response</string>
+    <string name="emergency_text">The normal alarm sound could not start.</string>
+    <string name="missed_title">Missed alarm: %s</string>
+    <string name="missed_timeout">Stopped after %s without a response</string>
+    <string name="missed_interrupted">Ringing was interrupted by the system</string>
+    <string name="missed_replaced">Replaced by another alarm</string>
+    <string name="missed_not_fired">Did not go off – device was off or the clock was changed</string>
+
+    <!-- Zuverlässigkeit -->
+    <string name="action_allow">Allow</string>
+    <string name="action_change">Change</string>
+    <string name="action_sounds">Sound</string>
+    <string name="action_storage">Storage</string>
+    <string name="action_exception">Exempt</string>
+    <string name="issue_notifications_title">Notifications are off</string>
+    <string name="issue_notifications_text">Without them the ringing alarm does not appear on the screen.</string>
+    <string name="issue_fullscreen_title">Full-screen display not allowed</string>
+    <string name="issue_fullscreen_text">The alarm then cannot appear over the lock screen.</string>
+    <string name="issue_exact_title">Exact alarms not allowed</string>
+    <string name="issue_exact_text">Without this permission Android may delay the alarm.</string>
+    <string name="issue_volume_title">Alarm volume is set to 0</string>
+    <string name="issue_volume_text">The alarm would only vibrate. Turn up the alarm volume in the sound settings.</string>
+    <string name="issue_dnd_silent_title">Do Not Disturb is set to “Total silence”</string>
+    <string name="issue_dnd_silent_text">In this mode Android does not let any alarm ring either.</string>
+    <string name="issue_dnd_blocks_title">Do Not Disturb blocks alarms</string>
+    <string name="issue_dnd_blocks_text">Allow the “Alarms” category in the active Do Not Disturb mode.</string>
+    <string name="issue_restricted_title">Battery usage is “Restricted”</string>
+    <string name="issue_restricted_text">Some manufacturers then block the alarm in the background. “Optimized” or “Unrestricted” is safer.</string>
+    <string name="issue_channel_title">“Ringing alarm” notification turned down</string>
+    <string name="issue_channel_text">The ringing alarm then does not appear on the screen. Set the category back to “Pop on screen/Urgent”.</string>
+    <string name="issue_damaged_title">Saved alarms were damaged</string>
+    <string name="issue_damaged_text">Some alarms could not be read – please check the list and recreate missing alarms. Alarms that were already scheduled still go off.</string>
+    <string name="issue_write_title">Alarms could not be saved</string>
+    <string name="issue_write_text">The storage is probably full. Otherwise the latest changes will be missing after a restart.</string>
+    <string name="issue_battery_title">Battery optimization is active</string>
+    <string name="issue_battery_text">Android itself still lets alarms ring, but some manufacturers stop the app in the background. An exemption makes the alarm more reliable on such devices.</string>
+
+    <!-- Formatierung -->
+    <string name="fmt_date">EEE, MMM d</string>
+    <string name="fmt_date_year">EEE, MMM d, yyyy</string>
+    <string name="fmt_day_month">MMM d</string>
+    <string name="until">in %s</string>
+    <string name="until_less_than_minute">in less than 1 min</string>
+    <plurals name="until_days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <plurals name="hours_short">
+        <item quantity="one">%d h</item>
+        <item quantity="other">%d h</item>
+    </plurals>
+    <plurals name="minutes_short">
+        <item quantity="one">%d min</item>
+        <item quantity="other">%d min</item>
+    </plurals>
+    <string name="list_separator">", "</string>
+    <string name="list_and">%1$s and %2$s</string>
+    <string name="every_day">Every day</string>
+    <string name="workdays">Mon–Fri</string>
+    <string-array name="weekdays_short">
+        <item>Mo</item>
+        <item>Tu</item>
+        <item>We</item>
+        <item>Th</item>
+        <item>Fr</item>
+        <item>Sa</item>
+        <item>Su</item>
+    </string-array>
+    <string-array name="weekdays_abbr">
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
+    <string-array name="weekdays_long">
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+        <item>Sunday</item>
+    </string-array>
+    <!-- Grammatisches Geschlecht der Wochentage (m/f) – wählt ordinals_m oder ordinals_f. -->
+    <string-array name="weekday_gender">
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+    </string-array>
+    <!-- 1., 2., 3., 4., letzter – so, wie sie in weekday_group vor dem Wochentag stehen. -->
+    <string-array name="ordinals_m">
+        <item>first</item>
+        <item>second</item>
+        <item>third</item>
+        <item>fourth</item>
+        <item>last</item>
+    </string-array>
+    <string-array name="ordinals_f">
+        <item>first</item>
+        <item>second</item>
+        <item>third</item>
+        <item>fourth</item>
+        <item>last</item>
+    </string-array>
+    <string-array name="ordinal_chips">
+        <item>1st</item>
+        <item>2nd</item>
+        <item>3rd</item>
+        <item>4th</item>
+        <item>Last</item>
+    </string-array>
+    <!-- %1$s = Ordinalzahlen („first and last“), %2$s = Wochentage („Friday“) -->
+    <string name="weekday_group">%1$s %2$s</string>
+    <string name="desc_once">Once</string>
+    <string name="desc_once_on">Once, %s</string>
+    <string name="desc_daily">Daily</string>
+    <string name="desc_every_n_days">Every %d days</string>
+    <string name="desc_every_n_weeks">Every %1$d weeks: %2$s</string>
+    <string name="desc_monthly_on_day">Monthly on day %d</string>
+    <string name="desc_monthly_last_day">Monthly on the last day</string>
+    <string name="desc_every_n_months_on_day">Every %1$d months on day %2$d</string>
+    <string name="desc_every_n_months_last_day">Every %d months on the last day</string>
+    <string name="desc_monthly_weekday">Every %s of the month</string>
+    <string name="desc_every_n_months_weekday">Every %1$d months on the %2$s</string>
+    <string name="desc_yearly">Yearly on %s</string>
+    <string name="desc_every_n_years">Every %1$d years on %2$s</string>
+    <string name="desc_with_end">%1$s · until %2$s</string>
+
+    <!-- Hilfe -->
+    <string name="help_repeat_title">Repeating alarms</string>
+    <string name="help_repeat_text">Tap the repeat line of an alarm to choose a rule:\n• Once – on a date or the next time the time comes round\n• Every n days – e.g. every 3rd day\n• Every n weeks on chosen weekdays – e.g. every other week on Monday and Thursday\n• Monthly on a day – e.g. on the 15th or on the last day\n• Monthly on a weekday – e.g. the first and third Thursday or the last Friday\n• Yearly\nEvery rule can have an end date. The preview shows the next occurrences.\nThe weekday circles on the card work like in the Android clock.</string>
+    <string name="help_timetable_title">Alternating weeks and timetables</string>
+    <string name="help_timetable_text">For a rhythm that changes from week to week – A/B weeks at school, early and late shifts, a uni timetable – create one alarm per pattern with “Every 2 weeks”, e.g. 6:00 on Mon–Wed and 8:30 on Thu–Fri.\nThe start date decides which week counts: the interval is counted from the week of the start date. For the other week, give a second alarm a start date one week later.\nLonger cycles work too, e.g. every 3 or 4 weeks.</string>
+    <string name="help_pause_title">Pausing</string>
+    <string name="help_pause_text">Repeating alarms can be paused – for holidays, for example. Choose days, weeks or months starting today, a number of occurrences to skip, or a last date. The dialog lists the occurrences that are skipped. After the pause the alarm continues by itself.</string>
+    <string name="help_ringing_title">Snooze, volume and sound</string>
+    <string name="help_ringing_text">Snooze length and “Gradually louder” can be set per alarm or as a default in the settings. A ringing alarm stops by itself after the time set in the settings and then shows a “Missed alarm” notice.\nYou can use the device’s alarm sounds and ringtones or your own audio file. Your own file is copied into the app so that it still plays after a restart.</string>
+    <string name="help_reliability_title">Reliability</string>
+    <string name="help_reliability_text">Alarms use Android’s alarm clock function and ring in Doze, battery saver and Do Not Disturb (if alarms are allowed there). After a restart they work even before the first unlock.\nThe app checks permissions, alarm volume and Do Not Disturb and shows warnings in the list and the settings.\nImportant: “Force stop” in the app info deletes all scheduled alarms until you open the app again.\nIf the normal sound cannot start, an emergency alarm with a notification rings instead. If an alarm could not ring (device off, clock changed), you get a “Missed alarm” notice.\nTip: try the test alarm in the settings once with the screen locked.</string>
+    <string name="help_flip_title">Turn over to snooze</string>
+    <string name="help_flip_text">While an alarm is ringing, place the phone face down to snooze it. After the snooze time it rings again. If the phone is still lying face down, pick it up and put it down again – or tap “Snooze”. The motion sensor only runs while an alarm is ringing. You can turn this off in the settings.</string>
+    <string name="help_privacy_title">Privacy</string>
+    <string name="help_privacy_text">The app has no internet permission. All alarms stay on your device.</string>
+    <string name="help_about_title">About</string>
+    <string name="help_about_text">Version %1$s\nFree software under the GNU General Public License v3.0.\nSource code and issues: %2$s</string>
 </resources>

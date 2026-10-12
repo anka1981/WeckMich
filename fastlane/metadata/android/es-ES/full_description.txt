@@ -1,0 +1,31 @@
+<p><b>Un despertador que sigue tu ritmo, aunque cambie de una semana a otra.</b></p>
+
+<p>Semanas A/B en el colegio, turnos de mañana y de tarde, un horario de la universidad que cambia cada dos semanas: con Despiértame configuras cada alarma una sola vez con una regla flexible y suena justo los días correctos. Se acabó activar y desactivar alarmas cada domingo por la noche.</p>
+
+<p><b>Reglas que el reloj integrado no permite</b></p>
+<ul>
+<li><b>Cada n semanas</b> en los días elegidos – p. ej., lunes y jueves cada dos semanas; la fecha de inicio decide qué semana cuenta</li>
+<li><b>Mensual en un día de la semana</b> – p. ej., el 1.er martes, el 1.er y el 3.er jueves o el último viernes del mes</li>
+<li><b>Mensual en un día</b> – p. ej., el día 15 o el último día del mes</li>
+<li>Cada n días, anual o una sola vez – cada una con fecha de inicio y fecha de fin opcional</li>
+</ul>
+<p>Una vista previa muestra las próximas repeticiones, para que veas de un vistazo si la regla es correcta.</p>
+
+<p><b>Pausar en lugar de borrar</b><br/>
+¿Te vas de vacaciones? Pausa las alarmas repetidas durante días, semanas o meses, durante un número de repeticiones o hasta una fecha. La aplicación muestra qué repeticiones se omiten y después continúa sola.</p>
+
+<p><b>Al despertar</b></p>
+<ul>
+<li>Da la vuelta al teléfono para posponer</li>
+<li>Duración de la posposición y volumen progresivo por alarma o como predeterminado</li>
+<li>Sonidos de alarma, tonos de llamada del dispositivo o tu propio archivo de audio</li>
+<li>Suena de forma fiable en modo Doze, con ahorro de batería y con No molestar, y tras un reinicio incluso antes del primer desbloqueo</li>
+<li>Comprueba los permisos, el volumen de alarma y No molestar, y te avisa de todo lo que impediría que sonara la alarma</li>
+<li>Aviso «Alarma perdida» si el dispositivo estaba apagado o la alarma se detuvo sin respuesta</li>
+<li>Alarma de prueba en 1 minuto</li>
+</ul>
+
+<p><b>Privacidad</b><br/>
+Sin permiso de Internet, sin anuncios, sin rastreo. Tus alarmas se quedan en tu dispositivo.</p>
+
+<p>Disponible en inglés, alemán, francés, español, italiano, portugués y neerlandés; la aplicación sigue el idioma del sistema.</p>

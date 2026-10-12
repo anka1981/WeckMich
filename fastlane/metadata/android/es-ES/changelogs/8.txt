@@ -1,0 +1,1 @@
+Primera versión en F-Droid: disponible en inglés, alemán, francés, español, italiano, portugués y neerlandés (sigue el idioma del sistema), nueva página de ayuda, dar la vuelta al teléfono para posponer, las horas siguen el ajuste de 12/24 horas.

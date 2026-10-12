@@ -1,5 +1,8 @@
 package com.andik.wecker.ui
 
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import com.andik.wecker.data.SoundFiles
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -59,7 +62,14 @@ data class Sound(val uri: String?, val name: String)
 private data class SoundSection(val title: String, val sounds: List<Sound>)
 
 fun builtinSound(context: Context) =
-    Sound("android.resource://${context.packageName}/${R.raw.fallback_alarm}", "Eingebauter Piepton")
+    Sound(SoundFiles.builtinUri(context), context.getString(R.string.builtin_sound))
+
+/** Anzeigename des Tons eines Weckers; der eingebaute folgt der aktuellen Sprache. */
+fun soundName(context: Context, uri: String?, storedName: String?): String = when {
+    uri == null -> context.getString(R.string.default_sound)
+    uri == SoundFiles.builtinUri(context) -> context.getString(R.string.builtin_sound)
+    else -> storedName ?: context.getString(R.string.custom_file)
+}
 
 private fun systemSounds(context: Context, type: Int): List<Sound> = runCatching {
     val rm = RingtoneManager(context).apply { setType(type) }
@@ -84,14 +94,14 @@ private fun defaultSoundName(context: Context): String {
         RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_ALARM)
             ?.let { RingtoneManager.getRingtone(context, it)?.getTitle(context) }
     }.getOrNull()
-    return if (title.isNullOrBlank()) "Standard-Weckton" else "Standard-Weckton ($title)"
+    return if (title.isNullOrBlank()) context.getString(R.string.default_sound) else context.getString(R.string.default_sound_named, title)
 }
 
 private fun fileName(context: Context, uri: Uri): String = runCatching {
     context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use {
         if (it.moveToFirst()) it.getString(0) else null
     }
-}.getOrNull()?.substringBeforeLast('.') ?: "Eigene Datei"
+}.getOrNull()?.substringBeforeLast('.') ?: context.getString(R.string.custom_file)
 
 /** Spielt einen Ton zum Vorhören über den Wecker-Audiokanal, also in der späteren Lautstärke. */
 private class Preview(private val context: Context) {
@@ -133,24 +143,28 @@ fun SoundPickerDialog(current: String?, currentName: String?, onDismiss: () -> U
     DisposableEffect(Unit) { onDispose { preview.stop() } }
 
     var sections by remember { mutableStateOf<List<SoundSection>?>(null) }
-    var custom by remember { mutableStateOf<Sound?>(null) }
-    var selected by remember { mutableStateOf<Sound?>(null) }
+    // Überlebt Drehen: sonst wäre nach einer Drehung die Auswahl weg und eine gerade übernommene
+    // eigene Datei fehlte in der Liste.
+    var custom by rememberSaveable(stateSaver = SoundSaver) { mutableStateOf<Sound?>(null) }
+    var selected by rememberSaveable(stateSaver = SoundSaver) { mutableStateOf<Sound?>(null) }
 
+    val alarmSoundsTitle = stringResource(R.string.alarm_sounds)
+    val ringtonesTitle = stringResource(R.string.ringtones)
     LaunchedEffect(Unit) {
         val loaded = withContext(Dispatchers.IO) {
             listOf(
                 SoundSection("", listOf(Sound(null, defaultSoundName(context)), builtinSound(context))),
-                SoundSection("Wecktöne", systemSounds(context, RingtoneManager.TYPE_ALARM)),
-                SoundSection("Klingeltöne", systemSounds(context, RingtoneManager.TYPE_RINGTONE)),
+                SoundSection(alarmSoundsTitle, systemSounds(context, RingtoneManager.TYPE_ALARM)),
+                SoundSection(ringtonesTitle, systemSounds(context, RingtoneManager.TYPE_RINGTONE)),
             ).filter { it.sounds.isNotEmpty() }
         }
         val all = loaded.flatMap { it.sounds }
         val match = all.firstOrNull { it.uri == current }
-        if (match == null && current != null) {
+        if (custom == null && match == null && current != null) {
             // Der Name einer kopierten Datei ist nur noch am Wecker gespeichert, nicht an der Datei-URI.
             custom = Sound(current, currentName ?: withContext(Dispatchers.IO) { fileName(context, Uri.parse(current)) })
         }
-        selected = match ?: custom ?: all.first()
+        if (selected == null) selected = match ?: custom ?: all.first()
         sections = loaded
     }
 
@@ -164,7 +178,7 @@ fun SoundPickerDialog(current: String?, currentName: String?, onDismiss: () -> U
             val local = withContext(Dispatchers.IO) { SoundFiles.import(context, uri) }
             copying = false
             if (local == null) {
-                Toast.makeText(context, "Datei konnte nicht übernommen werden (zu groß oder nicht lesbar).", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, R.string.file_import_failed, Toast.LENGTH_LONG).show()
                 return@launch
             }
             val sound = Sound(local.toString(), name)
@@ -189,10 +203,10 @@ fun SoundPickerDialog(current: String?, currentName: String?, onDismiss: () -> U
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Weckton") },
-                    navigationIcon = { IconButton(onClick = onDismiss) { Icon(Icons.Filled.Close, "Abbrechen") } },
+                    title = { Text(stringResource(R.string.sound)) },
+                    navigationIcon = { IconButton(onClick = onDismiss) { Icon(Icons.Filled.Close, stringResource(R.string.cancel)) } },
                     actions = {
-                        TextButton(onClick = { selected?.let(onConfirm) }, enabled = selected != null) { Text("Fertig") }
+                        TextButton(onClick = { selected?.let(onConfirm) }, enabled = selected != null) { Text(stringResource(R.string.done)) }
                     },
                 )
             },
@@ -200,14 +214,14 @@ fun SoundPickerDialog(current: String?, currentName: String?, onDismiss: () -> U
             LazyColumn(Modifier.padding(padding).fillMaxSize()) {
                 item {
                     ListItem(
-                        headlineContent = { Text(if (copying) "Datei wird übernommen …" else "Eigene Audiodatei wählen …") },
+                        headlineContent = { Text(stringResource(if (copying) R.string.file_importing else R.string.file_choose)) },
                         leadingContent = { Icon(Icons.Filled.FolderOpen, null) },
                         modifier = Modifier.selectable(false) { filePicker.launch(arrayOf("audio/*")) },
                     )
                 }
                 custom?.let { c -> item { SoundRow(c, selected?.uri == c.uri) { select(c) } } }
                 if (sections == null) {
-                    item { Text("Lade Töne …", Modifier.padding(16.dp)) }
+                    item { Text(stringResource(R.string.sounds_loading), Modifier.padding(16.dp)) }
                 }
                 sections?.forEach { section ->
                     if (section.title.isNotEmpty()) {
@@ -242,3 +256,8 @@ private fun SoundRow(sound: Sound, isSelected: Boolean, onClick: () -> Unit) {
         Text(sound.name, Modifier.padding(start = 16.dp), style = MaterialTheme.typography.bodyLarge)
     }
 }
+
+private val SoundSaver = listSaver<Sound?, String?>(
+    save = { s -> if (s == null) emptyList() else listOf(s.uri, s.name) },
+    restore = { l -> if (l.isEmpty()) null else Sound(l[0], l[1].orEmpty()) },
+)

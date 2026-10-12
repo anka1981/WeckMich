@@ -1,0 +1,1 @@
+Erste Version für F-Droid: auf Deutsch, Englisch, Französisch, Spanisch, Italienisch, Portugiesisch und Niederländisch (folgt der Systemsprache), neue Hilfeseite, Handy umdrehen zum Schlummern, Uhrzeiten nach 12-/24-Stunden-Einstellung.

@@ -1,0 +1,31 @@
+<p><b>Een wekker die jouw ritme volgt – ook als dat per week verandert.</b></p>
+
+<p>A/B-weken op school, vroege en late diensten, een collegerooster dat om de week anders is: met Maak me wakker stel je elke wekker één keer in met een flexibele regel, en hij gaat gewoon op de juiste dagen af. Nooit meer elke zondagavond wekkers aan- en uitzetten.</p>
+
+<p><b>Regels die de ingebouwde klok-app niet kan</b></p>
+<ul>
+<li><b>Om de n weken</b> op gekozen weekdagen – bijv. om de week op maandag en donderdag; de startdatum bepaalt welke week telt</li>
+<li><b>Maandelijks op een weekdag</b> – bijv. de 1e dinsdag, de 1e en 3e donderdag of de laatste vrijdag van de maand</li>
+<li><b>Maandelijks op een dag</b> – bijv. op de 15e of op de laatste dag van de maand</li>
+<li>Om de n dagen, jaarlijks of eenmalig – elk met een startdatum en een optionele einddatum</li>
+</ul>
+<p>Een voorbeeld toont de volgende keren, zodat je in één oogopslag ziet of de regel klopt.</p>
+
+<p><b>Pauzeren in plaats van verwijderen</b><br/>
+Op vakantie? Pauzeer herhalende wekkers voor dagen, weken of maanden, voor een aantal keren of tot een datum. De app toont welke keren worden overgeslagen en gaat daarna vanzelf weer verder.</p>
+
+<p><b>Wakker worden</b></p>
+<ul>
+<li>Telefoon omdraaien om te snoozen</li>
+<li>Snoozeduur en geleidelijk luider wordend volume per wekker of als standaard</li>
+<li>Wekkergeluiden, beltonen van het apparaat of een eigen audiobestand</li>
+<li>Gaat betrouwbaar af in Doze, bij Batterijbesparing en bij Niet storen, en na een herstart zelfs vóór de eerste ontgrendeling</li>
+<li>Controleert toestemmingen, wekkervolume en Niet storen en waarschuwt je voor alles wat de wekker zou tegenhouden</li>
+<li>Melding ‘Gemiste wekker’ als het apparaat uit stond of de wekker zonder reactie is gestopt</li>
+<li>Testwekker over 1 minuut</li>
+</ul>
+
+<p><b>Privacy</b><br/>
+Geen internettoestemming, geen advertenties, geen tracking. Je wekkers blijven op je apparaat.</p>
+
+<p>Beschikbaar in het Engels, Duits, Frans, Spaans, Italiaans, Portugees en Nederlands; de app volgt de systeemtaal.</p>

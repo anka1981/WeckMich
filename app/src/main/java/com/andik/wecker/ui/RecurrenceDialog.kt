@@ -1,5 +1,7 @@
 package com.andik.wecker.ui
 
+import com.andik.wecker.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.foundation.clickable
@@ -87,9 +89,9 @@ fun RecurrenceDialog(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Wiederholung") },
-                    navigationIcon = { IconButton(onClick = onDismiss) { Icon(Icons.Filled.Close, "Abbrechen") } },
-                    actions = { TextButton(onClick = { onConfirm(r) }) { Text("Fertig") } },
+                    title = { Text(stringResource(R.string.repeat)) },
+                    navigationIcon = { IconButton(onClick = onDismiss) { Icon(Icons.Filled.Close, stringResource(R.string.cancel)) } },
+                    actions = { TextButton(onClick = { onConfirm(r) }) { Text(stringResource(R.string.done)) } },
                 )
             },
         ) { padding ->
@@ -125,10 +127,11 @@ fun RecurrenceDialog(
 
                 if (r.isRepeating) {
                     Column(section) {
-                        SectionTitle("Intervall")
+                        SectionTitle(stringResource(R.string.interval))
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(if (r.interval == 1) "Jede(n)" else "Alle", Modifier.padding(end = 8.dp))
-                            Stepper(r.interval, 1..Recurrence.maxInterval(r.type), "${r.interval}") {
+                            // „Jede 1 Woche“ läse sich falsch – das Vorwort erst ab 2.
+                            if (r.interval > 1) Text(Format.intervalPrefix(r.type, r.interval), Modifier.padding(end = 8.dp))
+                            Stepper(r.interval, 1..Recurrence.maxInterval(r.type), "${r.interval}", what = stringResource(R.string.interval)) {
                                 r = r.copy(interval = it)
                             }
                             Text(Format.unit(r.type, r.interval), Modifier.padding(start = 8.dp))
@@ -138,27 +141,27 @@ fun RecurrenceDialog(
 
                 when (r.type) {
                     RepeatType.WEEKLY -> Column(section) {
-                        SectionTitle("An diesen Tagen")
+                        SectionTitle(stringResource(R.string.on_these_days))
                         WeekdayChips(r.weekdays) { r = r.copy(weekdays = it) }
                     }
                     RepeatType.MONTHLY_DAY -> Column(section) {
-                        SectionTitle("Am Tag")
+                        SectionTitle(stringResource(R.string.on_day))
                         val last = r.dayOfMonth == LAST_DAY
                         if (!last) {
-                            Stepper(r.dayOfMonth, 1..31, "${r.dayOfMonth}.") { r = r.copy(dayOfMonth = it) }
+                            Stepper(r.dayOfMonth, 1..31, stringResource(R.string.day_of_month, r.dayOfMonth), what = stringResource(R.string.day_of_month_what)) { r = r.copy(dayOfMonth = it) }
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Checkbox(checked = last, onCheckedChange = {
                                 r = r.copy(dayOfMonth = if (it) LAST_DAY else (r.startDate ?: today).dayOfMonth)
                             })
-                            Text("Letzter Tag des Monats")
+                            Text(stringResource(R.string.last_day_of_month))
                         }
                         if (!last && r.dayOfMonth > 28) {
-                            Hint("In kürzeren Monaten klingelt der Wecker am letzten Tag des Monats.")
+                            Hint(stringResource(R.string.short_month_hint))
                         }
                     }
                     RepeatType.MONTHLY_WEEKDAY -> Column(section) {
-                        SectionTitle("Welcher im Monat")
+                        SectionTitle(stringResource(R.string.which_in_month))
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             listOf(1, 2, 3, 4, LAST_ORDINAL).forEach { o ->
                                 FilterChip(
@@ -167,15 +170,15 @@ fun RecurrenceDialog(
                                         val s = if (o in r.ordinals) r.ordinals - o else r.ordinals + o
                                         if (s.isNotEmpty()) r = r.copy(ordinals = s)
                                     },
-                                    label = { Text(if (o == LAST_ORDINAL) "Letzter" else "$o.") },
+                                    label = { Text(Format.ordinalChip(o)) },
                                 )
                             }
                         }
-                        SectionTitle("Wochentag")
+                        SectionTitle(stringResource(R.string.weekday))
                         WeekdayChips(r.weekdays) { r = r.copy(weekdays = it) }
                     }
                     RepeatType.YEARLY -> Column(section) {
-                        Hint("Der Wecker klingelt jeweils am Tag und Monat des Startdatums.")
+                        Hint(stringResource(R.string.yearly_hint))
                     }
                     else -> Unit
                 }
@@ -184,32 +187,32 @@ fun RecurrenceDialog(
 
                 if (r.isRepeating) {
                     ListItem(
-                        headlineContent = { Text("Beginnt am") },
+                        headlineContent = { Text(stringResource(R.string.starts_on)) },
                         supportingContent = {
-                            Text(Format.date(r.startDate ?: today, withYear = true) +
-                                if (r.interval > 1) " – von hier aus wird das Intervall gezählt" else "")
+                            val start = Format.date(r.startDate ?: today, withYear = true)
+                            Text(if (r.interval > 1) stringResource(R.string.interval_counted_from, start) else start)
                         },
                         leadingContent = { Icon(Icons.Filled.Event, null) },
                         modifier = Modifier.clickable { pickStart = true },
                     )
                     ListItem(
-                        headlineContent = { Text("Endet") },
-                        supportingContent = { Text(r.endDate?.let { "Nach dem ${Format.date(it, withYear = true)}" } ?: "Nie") },
+                        headlineContent = { Text(stringResource(R.string.ends)) },
+                        supportingContent = { Text(r.endDate?.let { stringResource(R.string.ends_after, Format.date(it, withYear = true)) } ?: stringResource(R.string.never)) },
                         leadingContent = { Icon(Icons.Filled.EventBusy, null) },
                         trailingContent = r.endDate?.let {
-                            { IconButton(onClick = { r = r.copy(endDate = null) }) { Icon(Icons.Filled.Clear, "Kein Ende") } }
+                            { IconButton(onClick = { r = r.copy(endDate = null) }) { Icon(Icons.Filled.Clear, stringResource(R.string.no_end)) } }
                         },
                         modifier = Modifier.clickable { pickEnd = true },
                     )
                 } else {
                     ListItem(
-                        headlineContent = { Text("Datum") },
+                        headlineContent = { Text(stringResource(R.string.date)) },
                         supportingContent = {
-                            Text(r.startDate?.let { Format.date(it, withYear = true) } ?: "Nächstes Mal, wenn die Uhrzeit erreicht ist")
+                            Text(r.startDate?.let { Format.date(it, withYear = true) } ?: stringResource(R.string.next_time_reached))
                         },
                         leadingContent = { Icon(Icons.Filled.Event, null) },
                         trailingContent = r.startDate?.let {
-                            { IconButton(onClick = { r = r.copy(startDate = null) }) { Icon(Icons.Filled.Clear, "Kein Datum") } }
+                            { IconButton(onClick = { r = r.copy(startDate = null) }) { Icon(Icons.Filled.Clear, stringResource(R.string.no_date)) } }
                         },
                         modifier = Modifier.clickable { pickStart = true },
                     )
@@ -217,7 +220,7 @@ fun RecurrenceDialog(
 
                 HorizontalDivider(Modifier.padding(vertical = 8.dp))
                 Column(section) {
-                    SectionTitle("Nächste Termine")
+                    SectionTitle(stringResource(R.string.upcoming))
                     // Wie die Planung: Termine während einer Pause fallen aus.
                     val upcoming = remember(r, time, pausedUntil) {
                         val now = LocalDateTime.now()
@@ -225,7 +228,7 @@ fun RecurrenceDialog(
                         r.nextOccurrences(time, if (resume != null && resume.isAfter(now)) resume else now, 8)
                     }
                     if (upcoming.isEmpty()) {
-                        Text("Keine weiteren Termine", color = MaterialTheme.colorScheme.error)
+                        Text(stringResource(R.string.no_more_occurrences), color = MaterialTheme.colorScheme.error)
                     }
                     upcoming.forEach {
                         Text(

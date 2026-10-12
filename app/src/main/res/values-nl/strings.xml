@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ImpliedQuantity: Einheiten ohne Zahl stehen neben einem Zähler ab 1. MissingQuantity: „many“ gilt erst ab einer Million. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity,MissingQuantity">
+    <string name="app_name">Maak me wakker</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Annuleren</string>
+    <string name="done">Klaar</string>
+    <string name="back">Terug</string>
+    <string name="alarm_default_label">Wekker</string>
+    <string name="snooze">Snoozen</string>
+    <string name="dismiss">Stoppen</string>
+    <string name="today">Vandaag</string>
+    <string name="tomorrow">Morgen</string>
+    <string name="never">Nooit</string>
+    <string name="time">Tijd</string>
+    <string name="decrease">%s verlagen</string>
+    <string name="increase">%s verhogen</string>
+
+    <string name="alarms_title">Wekkers</string>
+    <string name="settings">Instellingen</string>
+    <string name="help">Help</string>
+    <string name="add_alarm">Wekker toevoegen</string>
+    <string name="no_alarms">Nog geen wekkers</string>
+    <string name="no_further_occurrence">Deze regel heeft geen volgende keer meer</string>
+    <string name="alarm_rings_in">Wekker gaat af %s</string>
+    <string name="ringing_banner">Gaat af: %1$s %2$s</string>
+    <string name="setting_open_failed">Kan de instelling niet openen</string>
+    <string name="change_time">Tijd wijzigen</string>
+    <string name="alarm_switch">Wekker %s</string>
+    <string name="expand">Uitvouwen</string>
+    <string name="collapse">Samenvouwen</string>
+    <string name="repeat">Herhalen</string>
+    <string name="pause">Pauzeren</string>
+    <string name="pause_hint">Pauzeren voor dagen, weken of maanden</string>
+    <string name="label">Label</string>
+    <string name="label_add">Toevoegen</string>
+    <string name="label_placeholder">bijv. Groene bak buiten zetten</string>
+    <string name="sound">Wekkergeluid</string>
+    <string name="default_value">Standaard (%s)</string>
+    <string name="ramp_title">Geleidelijk luider</string>
+    <string name="vibrate">Trillen</string>
+    <string name="delete">Verwijderen</string>
+    <string name="snooze_length">Snoozeduur</string>
+    <string name="snoozing_until">Snoozet tot %s</string>
+    <string name="no_more_occurrences">Geen volgende keren meer</string>
+
+    <string name="paused_through">Gepauzeerd tot en met %s</string>
+    <string name="skipped_none">Er wordt geen keer overgeslagen.</string>
+    <plurals name="skipped">
+        <item quantity="one">%1$d keer wordt overgeslagen: %2$s</item>
+        <item quantity="other">%1$d keer worden overgeslagen: %2$s</item>
+    </plurals>
+    <plurals name="skipped_more">
+        <item quantity="one">en nog %d</item>
+        <item quantity="other">en nog %d</item>
+    </plurals>
+    <string name="next_occurrence">Volgende keer: %1$s, %2$s</string>
+    <string name="no_occurrence_after">Daarna zijn er geen keren meer.</string>
+    <string name="pause_title">Wekker pauzeren</string>
+    <string name="pause_current">Huidig</string>
+    <string name="pause_end">Pauze beëindigen</string>
+    <string name="pause_heading_period">Vanaf vandaag pauzeren voor</string>
+    <string name="pause_heading_occurrences">De volgende keren overslaan:</string>
+    <string name="pause_heading_replace_period">Nieuwe pauze (vervangt de huidige) – vanaf vandaag pauzeren voor</string>
+    <string name="pause_heading_replace_occurrences">Nieuwe pauze (vervangt de huidige) – de volgende keren overslaan:</string>
+    <string name="pause_count">aantal</string>
+    <string name="pause_preview">Gepauzeerd tot en met %s</string>
+    <string name="pause_until_date">In plaats daarvan tot en met een datum …</string>
+    <string name="pause_replace">Pauze vervangen</string>
+    <string name="pause_confirm">Pauzeren</string>
+    <plurals name="unit_days">
+        <item quantity="one">dag</item>
+        <item quantity="other">dagen</item>
+    </plurals>
+    <plurals name="unit_weeks">
+        <item quantity="one">week</item>
+        <item quantity="other">weken</item>
+    </plurals>
+    <plurals name="unit_months">
+        <item quantity="one">maand</item>
+        <item quantity="other">maanden</item>
+    </plurals>
+    <plurals name="unit_years">
+        <item quantity="one">jaar</item>
+        <item quantity="other">jaar</item>
+    </plurals>
+    <plurals name="unit_occurrences">
+        <item quantity="one">keer</item>
+        <item quantity="other">keer</item>
+    </plurals>
+
+    <string name="type_once">Eenmalig</string>
+    <string name="type_daily">Dagelijks / om de n dagen</string>
+    <string name="type_weekly">Wekelijks / om de n weken</string>
+    <string name="type_monthly_day">Maandelijks op een dag</string>
+    <string name="type_monthly_weekday">Maandelijks op een weekdag</string>
+    <string name="type_yearly">Jaarlijks</string>
+    <string name="hint_once">Gaat één keer af</string>
+    <string name="hint_daily">bijv. om de 3 dagen</string>
+    <string name="hint_weekly">bijv. om de week op maandag – wisselende weken, ploegendiensten of lesroosters</string>
+    <string name="hint_monthly_day">bijv. op de 15e of op de laatste dag</string>
+    <string name="hint_monthly_weekday">bijv. op de eerste dinsdag van de maand</string>
+    <string name="hint_yearly">bijv. elk jaar op 8 okt.</string>
+    <string name="interval">Interval</string>
+    <plurals name="interval_prefix_days">
+        <item quantity="one">Elke</item>
+        <item quantity="other">Om de</item>
+    </plurals>
+    <plurals name="interval_prefix_weeks">
+        <item quantity="one">Elke</item>
+        <item quantity="other">Om de</item>
+    </plurals>
+    <plurals name="interval_prefix_months">
+        <item quantity="one">Elke</item>
+        <item quantity="other">Om de</item>
+    </plurals>
+    <plurals name="interval_prefix_years">
+        <item quantity="one">Elk</item>
+        <item quantity="other">Om de</item>
+    </plurals>
+    <string name="on_these_days">Op deze dagen</string>
+    <string name="on_day">Op dag</string>
+    <string name="day_of_month">%d</string>
+    <string name="day_of_month_what">dag</string>
+    <string name="last_day_of_month">Laatste dag van de maand</string>
+    <string name="short_month_hint">In kortere maanden gaat de wekker af op de laatste dag van de maand.</string>
+    <string name="which_in_month">Welke in de maand</string>
+    <string name="weekday">Weekdag</string>
+    <string name="yearly_hint">De wekker gaat elk jaar af op de dag en maand van de startdatum.</string>
+    <string name="starts_on">Begint op</string>
+    <string name="interval_counted_from">%s – vanaf hier wordt het interval geteld</string>
+    <string name="ends">Eindigt</string>
+    <string name="ends_after">Na %s</string>
+    <string name="no_end">Geen einde</string>
+    <string name="date">Datum</string>
+    <string name="next_time_reached">De volgende keer dat het deze tijd is</string>
+    <string name="no_date">Geen datum</string>
+    <string name="upcoming">Volgende keren</string>
+
+    <string name="default_snooze">Standaard snoozeduur</string>
+    <string name="default_snooze_sub">%s – voor wekkers zonder eigen duur</string>
+    <string name="ring_for">Wekker stopt na</string>
+    <string name="ring_for_sub">%s zonder reactie – daarna krijg je de melding ‘Gemiste wekker’</string>
+    <string name="ring_for_never_sub">Gaat af tot je reageert</string>
+    <string name="default_ramp">Standaard voor ‘Geleidelijk luider’</string>
+    <string name="default_ramp_sub">%s – voor wekkers zonder eigen instelling</string>
+    <string name="ramp_dialog_title">Volume geleidelijk verhogen</string>
+    <string name="flip_to_snooze">Omdraaien om te snoozen</string>
+    <string name="flip_to_snooze_sub">Leg je de telefoon met het scherm naar beneden, dan snoozet een afgaande wekker. Wil je later opnieuw snoozen, pak hem dan eerst even op.</string>
+    <string name="reliability">Betrouwbaarheid</string>
+    <string name="all_set">Alles ingesteld – wekkers gaan ook af bij Niet storen en Batterijbesparing.</string>
+    <string name="test_advice">Test de wekker het best één keer met vergrendeld scherm en Niet storen aan. Belangrijk: ‘Gedwongen stoppen’ in de app-info wist alle geplande wekkers totdat je de app weer opent.</string>
+    <string name="test_alarm_label">Testwekker</string>
+    <string name="test_alarm_toast">Testwekker gaat over 1 minuut af – vergrendel nu het scherm</string>
+    <string name="test_alarm_button">Testwekker over 1 minuut</string>
+
+    <string name="ramp_off">Uit – meteen vol volume</string>
+    <plurals name="ramp_seconds">
+        <item quantity="one">In %d seconde luider worden</item>
+        <item quantity="other">In %d seconden luider worden</item>
+    </plurals>
+    <plurals name="ramp_minutes">
+        <item quantity="one">In %d minuut luider worden</item>
+        <item quantity="other">In %d minuten luider worden</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d minuut</item>
+        <item quantity="other">%d minuten</item>
+    </plurals>
+
+    <string name="default_sound">Standaard wekkergeluid</string>
+    <string name="default_sound_named">Standaard wekkergeluid (%s)</string>
+    <string name="builtin_sound">Ingebouwde pieptoon</string>
+    <string name="custom_file">Eigen bestand</string>
+    <string name="alarm_sounds">Wekkergeluiden</string>
+    <string name="ringtones">Beltonen</string>
+    <string name="file_import_failed">Het bestand kan niet worden gebruikt (te groot of niet leesbaar).</string>
+    <string name="file_importing">Bestand importeren …</string>
+    <string name="file_choose">Eigen audiobestand kiezen …</string>
+    <string name="sounds_loading">Geluiden laden …</string>
+
+    <string name="channel_ringing">Afgaande wekker</string>
+    <string name="channel_ringing_desc">Toont de afgaande wekker, ook op het vergrendelscherm</string>
+    <string name="channel_emergency">Wekker (noodgeval)</string>
+    <string name="channel_emergency_desc">Gaat af als het normale wekkergeluid niet kan starten</string>
+    <string name="channel_missed">Gemiste wekkers</string>
+    <string name="channel_missed_desc">Melding als een wekker is gemist of zonder reactie is gestopt</string>
+    <string name="emergency_text">Het normale wekkergeluid kon niet starten.</string>
+    <string name="missed_title">Gemiste wekker: %s</string>
+    <string name="missed_timeout">Gestopt na %s zonder reactie</string>
+    <string name="missed_interrupted">Afgaan is door het systeem onderbroken</string>
+    <string name="missed_replaced">Vervangen door een andere wekker</string>
+    <string name="missed_not_fired">Niet afgegaan – apparaat stond uit of de tijd is gewijzigd</string>
+
+    <string name="action_allow">Toestaan</string>
+    <string name="action_change">Wijzigen</string>
+    <string name="action_sounds">Geluid</string>
+    <string name="action_storage">Opslag</string>
+    <string name="action_exception">Uitzondering</string>
+    <string name="issue_notifications_title">Meldingen staan uit</string>
+    <string name="issue_notifications_text">Zonder meldingen verschijnt de afgaande wekker niet op het scherm.</string>
+    <string name="issue_fullscreen_title">Volledig scherm niet toegestaan</string>
+    <string name="issue_fullscreen_text">De wekker kan dan niet boven het vergrendelscherm verschijnen.</string>
+    <string name="issue_exact_title">Exacte wekkers niet toegestaan</string>
+    <string name="issue_exact_text">Zonder deze toestemming kan Android de wekker vertragen.</string>
+    <string name="issue_volume_title">Wekkervolume staat op 0</string>
+    <string name="issue_volume_text">De wekker zou alleen trillen. Zet het wekkervolume hoger in de geluidsinstellingen.</string>
+    <string name="issue_dnd_silent_title">Niet storen staat op ‘Totale stilte’</string>
+    <string name="issue_dnd_silent_text">In deze modus laat Android ook geen enkele wekker afgaan.</string>
+    <string name="issue_dnd_blocks_title">Niet storen blokkeert wekkers</string>
+    <string name="issue_dnd_blocks_text">Sta de categorie ‘Wekkers’ toe in de actieve Niet storen-modus.</string>
+    <string name="issue_restricted_title">Batterijgebruik staat op ‘Beperkt’</string>
+    <string name="issue_restricted_text">Sommige fabrikanten blokkeren de wekker dan op de achtergrond. ‘Geoptimaliseerd’ of ‘Onbeperkt’ is veiliger.</string>
+    <string name="issue_channel_title">Melding ‘Afgaande wekker’ afgezwakt</string>
+    <string name="issue_channel_text">De afgaande wekker verschijnt dan niet op het scherm. Zet de categorie weer op ‘Op scherm tonen/Urgent’.</string>
+    <string name="issue_damaged_title">Opgeslagen wekkers waren beschadigd</string>
+    <string name="issue_damaged_text">Sommige wekkers konden niet worden gelezen – controleer de lijst en maak ontbrekende wekkers opnieuw. Wekkers die al gepland waren, gaan toch af.</string>
+    <string name="issue_write_title">Wekkers konden niet worden opgeslagen</string>
+    <string name="issue_write_text">Waarschijnlijk is de opslag vol. Anders ontbreken na een herstart de laatste wijzigingen.</string>
+    <string name="issue_battery_title">Batterijoptimalisatie is actief</string>
+    <string name="issue_battery_text">Android zelf laat wekkers gewoon afgaan, maar sommige fabrikanten stoppen de app op de achtergrond. Een uitzondering maakt de wekker op zulke apparaten betrouwbaarder.</string>
+
+    <string name="fmt_date">EEE d MMM</string>
+    <string name="fmt_date_year">EEE d MMM yyyy</string>
+    <string name="fmt_day_month">d MMM</string>
+    <string name="until">over %s</string>
+    <string name="until_less_than_minute">over minder dan 1 min</string>
+    <plurals name="until_days">
+        <item quantity="one">%d dag</item>
+        <item quantity="other">%d dagen</item>
+    </plurals>
+    <plurals name="hours_short">
+        <item quantity="one">%d u</item>
+        <item quantity="other">%d u</item>
+    </plurals>
+    <plurals name="minutes_short">
+        <item quantity="one">%d min</item>
+        <item quantity="other">%d min</item>
+    </plurals>
+    <string name="list_separator">", "</string>
+    <string name="list_and">%1$s en %2$s</string>
+    <string name="every_day">Elke dag</string>
+    <string name="workdays">ma–vr</string>
+    <string-array name="weekdays_short">
+        <item>Ma</item>
+        <item>Di</item>
+        <item>Wo</item>
+        <item>Do</item>
+        <item>Vr</item>
+        <item>Za</item>
+        <item>Zo</item>
+    </string-array>
+    <string-array name="weekdays_abbr">
+        <item>ma</item>
+        <item>di</item>
+        <item>wo</item>
+        <item>do</item>
+        <item>vr</item>
+        <item>za</item>
+        <item>zo</item>
+    </string-array>
+    <string-array name="weekdays_long">
+        <item>maandag</item>
+        <item>dinsdag</item>
+        <item>woensdag</item>
+        <item>donderdag</item>
+        <item>vrijdag</item>
+        <item>zaterdag</item>
+        <item>zondag</item>
+    </string-array>
+    <string-array name="weekday_gender">
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+    </string-array>
+    <string-array name="ordinals_m">
+        <item>eerste</item>
+        <item>tweede</item>
+        <item>derde</item>
+        <item>vierde</item>
+        <item>laatste</item>
+    </string-array>
+    <string-array name="ordinals_f">
+        <item>eerste</item>
+        <item>tweede</item>
+        <item>derde</item>
+        <item>vierde</item>
+        <item>laatste</item>
+    </string-array>
+    <string-array name="ordinal_chips">
+        <item>1e</item>
+        <item>2e</item>
+        <item>3e</item>
+        <item>4e</item>
+        <item>Laatste</item>
+    </string-array>
+    <string name="weekday_group">%1$s %2$s</string>
+    <string name="desc_once">Eenmalig</string>
+    <string name="desc_once_on">Eenmalig, %s</string>
+    <string name="desc_daily">Dagelijks</string>
+    <string name="desc_every_n_days">Om de %d dagen</string>
+    <string name="desc_every_n_weeks">Om de %1$d weken: %2$s</string>
+    <string name="desc_monthly_on_day">Maandelijks op dag %d</string>
+    <string name="desc_monthly_last_day">Maandelijks op de laatste dag</string>
+    <string name="desc_every_n_months_on_day">Om de %1$d maanden op dag %2$d</string>
+    <string name="desc_every_n_months_last_day">Om de %d maanden op de laatste dag</string>
+    <string name="desc_monthly_weekday">Elke %s van de maand</string>
+    <string name="desc_every_n_months_weekday">Om de %1$d maanden op de %2$s</string>
+    <string name="desc_yearly">Jaarlijks op %s</string>
+    <string name="desc_every_n_years">Om de %1$d jaar op %2$s</string>
+    <string name="desc_with_end">%1$s · tot %2$s</string>
+
+    <string name="help_repeat_title">Herhalende wekkers</string>
+    <string name="help_repeat_text">Tik op de herhaalregel van een wekker om een regel te kiezen:\n• Eenmalig – op een datum of de volgende keer dat het die tijd is\n• Om de n dagen – bijv. om de 3 dagen\n• Om de n weken op gekozen weekdagen – bijv. om de week op maandag en donderdag\n• Maandelijks op een dag – bijv. op de 15e of op de laatste dag\n• Maandelijks op een weekdag – bijv. de eerste en derde donderdag of de laatste vrijdag\n• Jaarlijks\nElke regel kan een einddatum hebben. Het voorbeeld toont de volgende keren.\nDe weekdagcirkels op de kaart werken zoals in de Android-klok.</string>
+    <string name="help_timetable_title">Wisselende weken en roosters</string>
+    <string name="help_timetable_text">Voor een ritme dat per week wisselt – A/B-weken op school, vroege en late diensten, een collegerooster – maak je per patroon een wekker met ‘Om de 2 weken’, bijv. 6:00 op ma–wo en 8:30 op do–vr.\nDe startdatum bepaalt welke week telt: het interval wordt geteld vanaf de week van de startdatum. Geef voor de andere week een tweede wekker een startdatum een week later.\nLangere cycli werken ook, bijv. om de 3 of 4 weken.</string>
+    <string name="help_pause_title">Pauzeren</string>
+    <string name="help_pause_text">Herhalende wekkers kun je pauzeren – bijvoorbeeld tijdens de vakantie. Kies dagen, weken of maanden vanaf vandaag, een aantal keren om over te slaan of een laatste datum. Het venster toont welke keren worden overgeslagen. Na de pauze gaat de wekker vanzelf weer verder.</string>
+    <string name="help_ringing_title">Snoozen, volume en geluid</string>
+    <string name="help_ringing_text">De snoozeduur en ‘Geleidelijk luider’ kun je per wekker of als standaard in de instellingen kiezen. Een afgaande wekker stopt vanzelf na de tijd die in de instellingen is gekozen en toont dan de melding ‘Gemiste wekker’.\nJe kunt de wekkergeluiden en beltonen van het apparaat gebruiken of een eigen audiobestand. Je eigen bestand wordt naar de app gekopieerd, zodat het ook na een herstart nog afspeelt.</string>
+    <string name="help_reliability_title">Betrouwbaarheid</string>
+    <string name="help_reliability_text">Wekkers gebruiken de wekkerfunctie van Android en gaan af in Doze, bij Batterijbesparing en bij Niet storen (als wekkers daar zijn toegestaan). Na een herstart werken ze al vóór de eerste ontgrendeling.\nDe app controleert toestemmingen, wekkervolume en Niet storen en toont waarschuwingen in de lijst en in de instellingen.\nBelangrijk: ‘Gedwongen stoppen’ in de app-info wist alle geplande wekkers totdat je de app weer opent.\nAls het normale geluid niet kan starten, gaat in plaats daarvan een noodwekker met melding af. Kon een wekker niet afgaan (apparaat uit, tijd gewijzigd), dan krijg je de melding ‘Gemiste wekker’.\nTip: probeer de testwekker in de instellingen één keer uit met vergrendeld scherm.</string>
+    <string name="help_flip_title">Omdraaien om te snoozen</string>
+    <string name="help_flip_text">Gaat er een wekker af, leg de telefoon dan met het scherm naar beneden om te snoozen. Na de snoozetijd gaat hij weer af. Ligt de telefoon nog omgedraaid, pak hem dan even op en leg hem weer neer – of tik op ‘Snoozen’. De bewegingssensor werkt alleen terwijl een wekker afgaat. Je kunt dit uitzetten in de instellingen.</string>
+    <string name="help_privacy_title">Privacy</string>
+    <string name="help_privacy_text">De app heeft geen internettoestemming. Alle wekkers blijven op je apparaat.</string>
+    <string name="help_about_title">Over</string>
+    <string name="help_about_text">Versie %1$s\nVrije software onder de GNU General Public License v3.0.\nBroncode en problemen melden: %2$s</string>
+</resources>

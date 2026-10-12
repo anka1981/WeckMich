@@ -25,6 +25,7 @@ object AlarmStore {
 
     @Synchronized
     fun init(context: Context) {
+        com.andik.wecker.model.Format.init(context)
         if (::prefs.isInitialized) return
         // Geräteverschlüsselter Speicher: lesbar schon vor dem ersten Entsperren nach einem Neustart,
         // damit Wecker auch nach einem nächtlichen System-Update klingeln.
@@ -63,6 +64,7 @@ object AlarmStore {
             snoozeMinutes = prefs.getInt("snoozeMinutes", 10),
             ringMinutes = prefs.getInt("ringMinutes", 10),
             rampSeconds = prefs.getInt("rampSeconds", 0),
+            flipToSnooze = prefs.getBoolean("flipToSnooze", true),
         )
     }
 
@@ -114,6 +116,7 @@ object AlarmStore {
             .putInt("snoozeMinutes", s.snoozeMinutes)
             .putInt("ringMinutes", s.ringMinutes)
             .putInt("rampSeconds", s.rampSeconds)
+            .putBoolean("flipToSnooze", s.flipToSnooze)
             .apply()
     }
 

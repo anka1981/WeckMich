@@ -1,0 +1,1 @@
+Eerste F-Droid-release: beschikbaar in het Engels, Duits, Frans, Spaans, Italiaans, Portugees en Nederlands (volgt de systeemtaal), nieuwe helppagina, telefoon omdraaien om te snoozen, tijden volgen de 12-/24-uursinstelling.

@@ -1,5 +1,6 @@
 package com.andik.wecker.alarm
 
+import com.andik.wecker.R
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -54,7 +55,7 @@ object Alarms {
             if (due != null && due <= now && due > now - Alarm.MISSED_GRACE_MILLIS) return@mapNotNull a
             val fixed = a.afterMissed(now)
             if (fixed !== a && a.scheduledAt != null && !a.temporary) {
-                MissedNotifier.notify(context, a, a.scheduledAt, "Nicht ausgelöst – Gerät aus oder Uhrzeit verstellt")
+                MissedNotifier.notify(context, a, a.scheduledAt, context.getString(R.string.missed_not_fired))
             }
             if (fixed == null) alarmManager(context).cancel(firePendingIntent(context, a.id))
             fixed?.copy(scheduledAt = nextFireMillis(fixed, now))
@@ -95,7 +96,9 @@ object Alarms {
             else -> {
                 // Den geklungenen Termin merken: er wird nie erneut geplant (Zeitumstellung, zu frühe
                 // Zustellung, Uhr zurückgestellt).
-                val rungAt = minOf(a.scheduledAt ?: now, now)
+                // Innerhalb der Toleranz zählt der geplante Termin – sonst würde er nach einer
+                // kleinen Uhrkorrektur rückwärts gleich noch einmal klingeln.
+                val rungAt = a.scheduledAt?.takeIf { it <= now + EARLY_TOLERANCE_MILLIS } ?: now
                 val rung = LocalDateTime.ofInstant(Instant.ofEpochMilli(rungAt), zone).truncatedTo(ChronoUnit.MINUTES)
                 a.copy(
                     snoozeUntil = null,

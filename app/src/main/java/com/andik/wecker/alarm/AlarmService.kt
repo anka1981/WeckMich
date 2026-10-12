@@ -1,5 +1,6 @@
 package com.andik.wecker.alarm
 
+import com.andik.wecker.data.SoundFiles
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,6 +9,10 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
@@ -28,6 +33,7 @@ import androidx.core.app.ServiceCompat
 import com.andik.wecker.R
 import com.andik.wecker.data.AlarmStore
 import com.andik.wecker.model.Alarm
+import com.andik.wecker.model.FaceDownDetector
 import com.andik.wecker.model.Format
 import com.andik.wecker.model.rampGain
 import com.andik.wecker.ui.RingingActivity
@@ -46,8 +52,11 @@ object RingingState {
  * Er wird aus dem [AlarmReceiver] gestartet; weil der Auslöser ein `setAlarmClock`-Wecker ist, darf
  * er das auch im Doze- und Stromsparmodus aus dem Hintergrund.
  */
-class AlarmService : Service() {
+class AlarmService : Service(), SensorEventListener {
     private val handler = Handler(Looper.getMainLooper())
+    private var faceDown: FaceDownDetector? = null
+    private var gravityZ = Float.NaN
+    private var lastSensorNanos = 0L
     private var player: MediaPlayer? = null
     private var vibrator: Vibrator? = null
     private var wakeLock: PowerManager.WakeLock? = null
@@ -66,7 +75,7 @@ class AlarmService : Service() {
         finishRinging()
         if (alarm != null && !alarm.temporary) {
             val minutes = AlarmStore.settings.value.ringMinutes
-            MissedNotifier.notify(this, alarm, ringStartedAt, "Nach $minutes Min. ohne Reaktion verstummt")
+            MissedNotifier.notify(this, alarm, ringStartedAt, getString(R.string.missed_timeout, Format.minutes(minutes)))
         }
     }
 
@@ -115,7 +124,7 @@ class AlarmService : Service() {
                     // klingeln; war die Klingeldauer schon um, nur als verpasst melden.
                     redelivered && ringMillis > 0 && elapsed >= ringMillis -> {
                         if (!alarm.temporary) {
-                            MissedNotifier.notify(this, alarm, System.currentTimeMillis() - elapsed, "Klingeln wurde vom System unterbrochen")
+                            MissedNotifier.notify(this, alarm, System.currentTimeMillis() - elapsed, getString(R.string.missed_interrupted))
                         }
                         if (current == null) finishRinging()
                     }
@@ -149,7 +158,7 @@ class AlarmService : Service() {
         // Ein noch klingelnder anderer Wecker wird abgelöst – mit Hinweis, statt spurlos zu verschwinden.
         RingingState.ringing.value?.takeIf { it.id != alarm.id }?.let { previous ->
             if (previous.temporary) Alarms.delete(this, previous.id)
-            else MissedNotifier.notify(this, previous, ringStartedAt, "Von einem weiteren Wecker abgelöst")
+            else MissedNotifier.notify(this, previous, ringStartedAt, getString(R.string.missed_replaced))
         }
         stopPlayback()
         RingingState.current.value = alarm
@@ -167,6 +176,7 @@ class AlarmService : Service() {
         val maxRamp = if (settings.ringMinutes > 0) settings.ringMinutes * 30 else Int.MAX_VALUE
         startSound(alarm, AlarmStore.rampSecondsFor(alarm).coerceAtMost(maxRamp))
         if (timeoutMillis > 0) handler.postDelayed(timeout, timeoutMillis)
+        if (settings.flipToSnooze) startFlipDetection()
         // Vollbild-Aktivität zusätzlich direkt starten; klappt nur, wenn das System es gerade zulässt
         // (sonst übernimmt die Vollbild-Benachrichtigung bzw. die Heads-up-Benachrichtigung).
         runCatching { startActivity(ringingIntent(this, alarm.id)) }
@@ -180,7 +190,7 @@ class AlarmService : Service() {
         getSystemService(AudioManager::class.java).requestAudioFocus(request)
         focusRequest = request
 
-        val fallback = Uri.parse("android.resource://$packageName/${R.raw.fallback_alarm}")
+        val fallback = Uri.parse(SoundFiles.builtinUri(this))
         val candidates = listOfNotNull(
             alarm.ringtone?.let(Uri::parse),
             RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM),
@@ -247,7 +257,46 @@ class AlarmService : Service() {
         vibrator = vib
     }
 
+    /**
+     * Umdrehen zum Schlummern. Der Sensor läuft nur, solange der Wecker klingelt; der Wakelock des
+     * Klingelns hält die CPU dafür wach. Ohne Sensor bleibt einfach der Schlummern-Knopf.
+     */
+    private fun startFlipDetection() {
+        val sm = getSystemService(SensorManager::class.java) ?: return
+        // Beschleunigungssensor, geglättet: Der kombinierte Schwerkraftsensor folgt einer schnellen
+        // 180°-Drehung je nach Gerät nur verzögert oder gar nicht. Das Vibrieren mittelt die Glättung weg.
+        val sensor = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) ?: return
+        faceDown = FaceDownDetector()
+        lastSensorNanos = 0L
+        gravityZ = Float.NaN // mit dem ersten Messwert starten, sonst gälte „nicht umgedreht“
+        sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, handler)
+    }
+
+    private fun stopFlipDetection() {
+        if (faceDown == null) return
+        faceDown = null
+        getSystemService(SensorManager::class.java)?.unregisterListener(this)
+    }
+
+    override fun onSensorChanged(event: SensorEvent) {
+        val detector = faceDown ?: return
+        val z = event.values[2]
+        // Tiefpass mit Zeitkonstante 0,3 s, unabhängig davon, wie oft das Gerät Messwerte liefert.
+        val dt = if (lastSensorNanos == 0L) 0f else (event.timestamp - lastSensorNanos) / 1e9f
+        lastSensorNanos = event.timestamp
+        val alpha = (dt / (0.3f + dt)).coerceIn(0f, 1f)
+        gravityZ = if (gravityZ.isNaN()) z else gravityZ + alpha * (z - gravityZ)
+        if (detector.onSample(gravityZ, System.currentTimeMillis())) {
+            val ringing = RingingState.ringing.value ?: return
+            Alarms.snooze(this, ringing.id, fallback = ringing)
+            finishRinging(snoozed = true)
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
+
     private fun stopPlayback() {
+        stopFlipDetection()
         soundAttempt++ // laufende Ladeversuche verwerfen
         prepareTimeout?.let(handler::removeCallbacks)
         prepareTimeout = null
@@ -278,7 +327,7 @@ class AlarmService : Service() {
 
     private fun unknownAlarm(id: Int): Alarm {
         val now = java.time.LocalTime.now()
-        return Alarm(id = id, hour = now.hour, minute = now.minute, label = "Wecker")
+        return Alarm(id = id, hour = now.hour, minute = now.minute)
     }
 
     override fun onDestroy() {
@@ -298,7 +347,7 @@ class AlarmService : Service() {
             Intent(this, AlarmService::class.java).setAction(action).putExtra(Alarms.EXTRA_ID, id),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
-        val title = alarm?.label?.takeIf { it.isNotBlank() } ?: "Wecker"
+        val title = alarm?.label?.takeIf { it.isNotBlank() } ?: getString(R.string.alarm_default_label)
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_alarm)
             .setContentTitle(title)
@@ -310,8 +359,8 @@ class AlarmService : Service() {
             .setAutoCancel(false)
             .apply { if (alarm != null) setFullScreenIntent(full, true) }
             .setContentIntent(full)
-            .addAction(0, "Schlummern", action(ACTION_SNOOZE))
-            .addAction(0, "Beenden", action(ACTION_DISMISS))
+            .addAction(0, getString(R.string.snooze), action(ACTION_SNOOZE))
+            .addAction(0, getString(R.string.dismiss), action(ACTION_DISMISS))
             .build()
     }
 
@@ -336,10 +385,11 @@ class AlarmService : Service() {
 
         fun createChannel(context: Context) {
             val nm = context.getSystemService(NotificationManager::class.java)
-            if (nm.getNotificationChannel(CHANNEL_ID) != null) return
+            // Erneutes Anlegen ändert nur Name und Beschreibung (z. B. nach einem Sprachwechsel),
+            // nie die Einstellungen, die der Nutzer am Kanal vorgenommen hat.
             nm.createNotificationChannel(
-                NotificationChannel(CHANNEL_ID, "Klingelnder Wecker", NotificationManager.IMPORTANCE_HIGH).apply {
-                    description = "Zeigt den klingelnden Wecker an, auch auf dem Sperrbildschirm"
+                NotificationChannel(CHANNEL_ID, context.getString(R.string.channel_ringing), NotificationManager.IMPORTANCE_HIGH).apply {
+                    description = context.getString(R.string.channel_ringing_desc)
                     setSound(null, null) // Der Ton kommt vom Dienst selbst über den Wecker-Audiokanal.
                     enableVibration(false)
                     lockscreenVisibility = Notification.VISIBILITY_PUBLIC

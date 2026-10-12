@@ -99,6 +99,7 @@ class RecurrenceTest {
     }
 
     @Test fun describe_texts() {
+        Format.texts = XmlTexts("de")
         val today = LocalDate.of(2026, 10, 8)
         assertEquals("Jede 2. Woche: Mo.",
             Format.describe(Recurrence(RepeatType.WEEKLY, interval = 2, startDate = today, weekdays = setOf(MONDAY)), today))
@@ -110,5 +111,39 @@ class RecurrenceTest {
             Format.describe(Recurrence(RepeatType.WEEKLY, startDate = today, weekdays = setOf(MONDAY, TUESDAY, java.time.DayOfWeek.WEDNESDAY, THURSDAY, FRIDAY)), today))
         assertEquals("Monatlich am letzten Tag",
             Format.describe(Recurrence(RepeatType.MONTHLY_DAY, startDate = today, dayOfMonth = LAST_DAY), today))
+    }
+
+    @Test fun describe_texts_english() {
+        Format.texts = XmlTexts(null)
+        val today = LocalDate.of(2026, 10, 8)
+        assertEquals("Every 2 weeks: Mon",
+            Format.describe(Recurrence(RepeatType.WEEKLY, interval = 2, startDate = today, weekdays = setOf(MONDAY)), today))
+        assertEquals("Every first and last Friday of the month",
+            Format.describe(Recurrence(RepeatType.MONTHLY_WEEKDAY, startDate = today, weekdays = setOf(FRIDAY), ordinals = setOf(LAST_ORDINAL, 1)), today))
+        assertEquals("Monthly on day 15 · until Thu, Dec 31",
+            Format.describe(Recurrence(RepeatType.MONTHLY_DAY, startDate = today, dayOfMonth = 15, endDate = LocalDate.of(2026, 12, 31)), today))
+        assertEquals("Yearly on Oct 8", Format.describe(Recurrence(RepeatType.YEARLY, startDate = today), today))
+    }
+
+    @Test fun dates_and_durations_german() {
+        Format.texts = XmlTexts("de")
+        assertEquals("Do., 8. Okt.", Format.date(LocalDate.of(2026, 10, 8)))
+        assertEquals("in 2 Tagen 3 Std.", Format.until(0, -(2 * 24 + 3) * 3_600_000L))
+        assertEquals("in 1 Tag", Format.until(0, -24 * 3_600_000L))
+        assertEquals("07:05", Format.time(7, 5))
+    }
+
+    @Test fun describe_mixed_genders_italian_and_portuguese() {
+        val today = LocalDate.of(2026, 10, 8)
+        val r = Recurrence(RepeatType.MONTHLY_WEEKDAY, startDate = today, weekdays = setOf(java.time.DayOfWeek.SATURDAY, java.time.DayOfWeek.SUNDAY), ordinals = setOf(2))
+        Format.texts = XmlTexts("it")
+        assertEquals("Ogni mese: il secondo sabato, la seconda domenica", Format.describe(r, today))
+        Format.texts = XmlTexts("pt")
+        assertEquals("Todos os meses: a segunda sexta-feira",
+            Format.describe(r.copy(weekdays = setOf(FRIDAY)), today))
+        assertEquals("qui., 8 de out.", Format.date(today))
+        Format.texts = XmlTexts("fr")
+        assertEquals("Chaque premier et dernier vendredi du mois",
+            Format.describe(r.copy(weekdays = setOf(FRIDAY), ordinals = setOf(1, LAST_ORDINAL)), today))
     }
 }

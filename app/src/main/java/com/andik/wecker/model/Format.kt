@@ -1,92 +1,152 @@
 package com.andik.wecker.model
 
+import com.andik.wecker.R
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
+import java.time.temporal.TemporalAccessor
 
+/**
+ * Alle sprachabhängigen Formatierungen. Die Satzbausteine stehen in den Ressourcen; hier wird nur
+ * zusammengesetzt, damit jede Sprache ihre eigene Wortstellung und Grammatik bekommt.
+ */
 object Format {
-    private val SHORT = listOf("Mo", "Di", "Mi", "Do", "Fr", "Sa", "So")
-    private val LONG = listOf("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag")
-    private val MONTHS = listOf("Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sept.", "Okt.", "Nov.", "Dez.")
-    private val WORKDAYS = setOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)
-    private val TIME = DateTimeFormatter.ofPattern("HH:mm", Locale.GERMANY)
+    /** Wird über [init] gesetzt, in Tests mit einer eigenen Implementierung. */
+    lateinit var texts: Texts
 
-    fun shortDay(d: DayOfWeek) = SHORT[d.value - 1]
-    fun longDay(d: DayOfWeek) = LONG[d.value - 1]
-
-    fun time(hour: Int, minute: Int) = "%02d:%02d".format(hour, minute)
-    fun time(t: java.time.temporal.TemporalAccessor): String = TIME.format(t)
-
-    /** „Do., 8. Okt.“ bzw. mit Jahr „Do., 8. Okt. 2026“ */
-    fun date(d: LocalDate, withYear: Boolean = false): String {
-        val base = "${shortDay(d.dayOfWeek)}., ${d.dayOfMonth}. ${MONTHS[d.monthValue - 1]}"
-        return if (withYear) "$base ${d.year}" else base
+    /**
+     * Idempotent; wird auch aus [com.andik.wecker.data.AlarmStore.init] aufgerufen, also auf jedem
+     * Weg zum Klingeln – Android startet die App z. B. für ein Backup ohne eigene Application-Klasse.
+     */
+    @Synchronized
+    fun init(context: android.content.Context) {
+        if (!::texts.isInitialized) texts = AndroidTexts(context)
     }
+
+    private val WORKDAYS = setOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)
+
+    private fun s(id: Int, vararg args: Any) = texts.str(id, *args)
+    private fun pattern(id: Int) = DateTimeFormatter.ofPattern(s(id), texts.locale)
+
+    /** Kurzform für Tageskreise und Auswahlchips („Mo“). */
+    fun shortDay(d: DayOfWeek) = texts.array(R.array.weekdays_short)[d.value - 1]
+
+    /** Abkürzung in Aufzählungen („Mo.“). */
+    fun abbrDay(d: DayOfWeek) = texts.array(R.array.weekdays_abbr)[d.value - 1]
+    fun longDay(d: DayOfWeek) = texts.array(R.array.weekdays_long)[d.value - 1]
+
+    /** Uhrzeit nach der 12-/24-Stunden-Einstellung des Geräts. */
+    fun time(hour: Int, minute: Int): String = time(java.time.LocalTime.of(hour, minute))
+    fun time(t: TemporalAccessor): String =
+        DateTimeFormatter.ofPattern(if (texts.is24Hour) "HH:mm" else "h:mm a", texts.locale).format(t)
+
+    /** „Do., 8. Okt.“ bzw. mit Jahr „Do., 8. Okt. 2026“ – Muster je Sprache. */
+    fun date(d: LocalDate, withYear: Boolean = false): String =
+        pattern(if (withYear) R.string.fmt_date_year else R.string.fmt_date).format(d)
 
     /** „Heute“, „Morgen“ oder das Datum. */
     fun relativeDay(d: LocalDate, today: LocalDate): String = when (d) {
-        today -> "Heute"
-        today.plusDays(1) -> "Morgen"
+        today -> s(R.string.today)
+        today.plusDays(1) -> s(R.string.tomorrow)
         else -> date(d, withYear = d.year != today.year)
     }
+
+    /** „Heute“/„Morgen“ mitten im Satz klein („Einmalig, heute“); ein Datum bleibt, wie es ist. */
+    private fun inSentence(word: String, d: LocalDate, today: LocalDate) =
+        if (d == today || d == today.plusDays(1)) word.lowercase(texts.locale) else word
 
     /** „in 2 Tagen 3 Std.“, „in 9 Std. 30 Min.“, „in 5 Min.“ */
     fun until(millis: Long, now: Long): String {
         val totalMin = ((millis - now + 59_999) / 60_000).coerceAtLeast(0)
-        val days = totalMin / (60 * 24)
-        val hours = (totalMin / 60) % 24
-        val minutes = totalMin % 60
-        return when {
-            totalMin < 1 -> "in weniger als 1 Min."
-            days > 0 -> "in $days ${if (days == 1L) "Tag" else "Tagen"}" + if (hours > 0) " $hours Std." else ""
-            hours > 0 -> "in $hours Std." + if (minutes > 0) " $minutes Min." else ""
-            else -> "in $minutes Min."
+        val days = (totalMin / (60 * 24)).toInt()
+        val hours = ((totalMin / 60) % 24).toInt()
+        val minutes = (totalMin % 60).toInt()
+        val parts = when {
+            totalMin < 1 -> return s(R.string.until_less_than_minute)
+            days > 0 -> listOfNotNull(texts.plural(R.plurals.until_days, days), hours.takeIf { it > 0 }?.let { texts.plural(R.plurals.hours_short, it) })
+            hours > 0 -> listOfNotNull(texts.plural(R.plurals.hours_short, hours), minutes.takeIf { it > 0 }?.let { texts.plural(R.plurals.minutes_short, it) })
+            else -> listOf(texts.plural(R.plurals.minutes_short, minutes))
         }
+        return s(R.string.until, parts.joinToString(" "))
     }
 
+    fun minutes(n: Int) = texts.plural(R.plurals.minutes, n)
+
     fun ramp(seconds: Int): String = when {
-        seconds == 0 -> "Aus – sofort volle Lautstärke"
-        seconds < 60 -> "In $seconds Sekunden lauter werden"
-        seconds == 60 -> "In 1 Minute lauter werden"
-        else -> "In ${seconds / 60} Minuten lauter werden"
+        seconds == 0 -> s(R.string.ramp_off)
+        seconds < 60 || seconds % 60 != 0 -> texts.plural(R.plurals.ramp_seconds, seconds)
+        else -> texts.plural(R.plurals.ramp_minutes, seconds / 60)
     }
 
     fun weekdayList(days: Set<DayOfWeek>): String = when {
-        days.size == 7 -> "Jeden Tag"
-        days == WORKDAYS -> "Mo.–Fr."
-        else -> days.sorted().joinToString(", ") { shortDay(it) + "." }
+        days.size == 7 -> s(R.string.every_day)
+        days == WORKDAYS -> s(R.string.workdays)
+        else -> days.sorted().joinToString(s(R.string.list_separator)) { abbrDay(it) }
     }
 
-    private fun joinAnd(items: List<String>): String =
-        if (items.size <= 1) items.joinToString() else items.dropLast(1).joinToString(", ") + " und " + items.last()
+    /** „a, b und c“ */
+    fun joinAnd(items: List<String>): String =
+        if (items.size <= 1) items.joinToString()
+        else s(R.string.list_and, items.dropLast(1).joinToString(s(R.string.list_separator)), items.last())
 
-    fun ordinalWord(o: Int) = if (o == LAST_ORDINAL) "letzten" else "$o."
-
+    /** Einheit ohne Zahl („Woche“/„Wochen“) für den Intervall-Stepper. */
     fun unit(type: RepeatType, n: Int): String = when (type) {
-        RepeatType.DAILY -> if (n == 1) "Tag" else "Tage"
-        RepeatType.WEEKLY -> if (n == 1) "Woche" else "Wochen"
-        RepeatType.MONTHLY_DAY, RepeatType.MONTHLY_WEEKDAY -> if (n == 1) "Monat" else "Monate"
-        RepeatType.YEARLY -> if (n == 1) "Jahr" else "Jahre"
+        RepeatType.DAILY -> texts.plural(R.plurals.unit_days, n)
+        RepeatType.WEEKLY -> texts.plural(R.plurals.unit_weeks, n)
+        RepeatType.MONTHLY_DAY, RepeatType.MONTHLY_WEEKDAY -> texts.plural(R.plurals.unit_months, n)
+        RepeatType.YEARLY -> texts.plural(R.plurals.unit_years, n)
         RepeatType.ONCE -> ""
     }
 
-    fun typeName(type: RepeatType): String = when (type) {
-        RepeatType.ONCE -> "Einmalig"
-        RepeatType.DAILY -> "Täglich / alle n Tage"
-        RepeatType.WEEKLY -> "Wöchentlich / alle n Wochen"
-        RepeatType.MONTHLY_DAY -> "Monatlich an einem Tag"
-        RepeatType.MONTHLY_WEEKDAY -> "Monatlich an einem Wochentag"
-        RepeatType.YEARLY -> "Jährlich"
+    /** „Jede“/„Alle“ vor dem Intervall-Stepper – das Geschlecht hängt in vielen Sprachen an der Einheit. */
+    fun intervalPrefix(type: RepeatType, n: Int): String = when (type) {
+        RepeatType.DAILY -> texts.plural(R.plurals.interval_prefix_days, n)
+        RepeatType.WEEKLY -> texts.plural(R.plurals.interval_prefix_weeks, n)
+        RepeatType.MONTHLY_DAY, RepeatType.MONTHLY_WEEKDAY -> texts.plural(R.plurals.interval_prefix_months, n)
+        RepeatType.YEARLY -> texts.plural(R.plurals.interval_prefix_years, n)
+        RepeatType.ONCE -> ""
     }
 
-    fun typeHint(type: RepeatType): String = when (type) {
-        RepeatType.ONCE -> "Klingelt ein Mal"
-        RepeatType.DAILY -> "z. B. jeden 3. Tag"
-        RepeatType.WEEKLY -> "z. B. jede 2. Woche montags"
-        RepeatType.MONTHLY_DAY -> "z. B. am 15. oder am letzten Tag"
-        RepeatType.MONTHLY_WEEKDAY -> "z. B. am 1. Dienstag im Monat"
-        RepeatType.YEARLY -> "z. B. jedes Jahr am 8. Okt."
+    fun typeName(type: RepeatType): String = s(
+        when (type) {
+            RepeatType.ONCE -> R.string.type_once
+            RepeatType.DAILY -> R.string.type_daily
+            RepeatType.WEEKLY -> R.string.type_weekly
+            RepeatType.MONTHLY_DAY -> R.string.type_monthly_day
+            RepeatType.MONTHLY_WEEKDAY -> R.string.type_monthly_weekday
+            RepeatType.YEARLY -> R.string.type_yearly
+        },
+    )
+
+    fun typeHint(type: RepeatType): String = s(
+        when (type) {
+            RepeatType.ONCE -> R.string.hint_once
+            RepeatType.DAILY -> R.string.hint_daily
+            RepeatType.WEEKLY -> R.string.hint_weekly
+            RepeatType.MONTHLY_DAY -> R.string.hint_monthly_day
+            RepeatType.MONTHLY_WEEKDAY -> R.string.hint_monthly_weekday
+            RepeatType.YEARLY -> R.string.hint_yearly
+        },
+    )
+
+    /** Beschriftung der Auswahlchips „1.“ … „4.“, „Letzter“. */
+    fun ordinalChip(o: Int): String = texts.array(R.array.ordinal_chips)[ordinalIndex(o)]
+
+    private fun ordinalIndex(o: Int) = if (o == LAST_ORDINAL || o !in 1..4) 4 else o - 1
+
+    /**
+     * „1. und letzten Freitag“. Sprachen mit grammatischem Geschlecht (z. B. „la prima domenica“,
+     * „il primo lunedì“) bekommen je Geschlecht eine eigene Gruppe mit passenden Ordinalzahlen.
+     */
+    private fun weekdayOrdinals(r: Recurrence): String {
+        val ords = r.ordinals.sortedBy { if (it == LAST_ORDINAL) 99 else it }
+        val genders = texts.array(R.array.weekday_gender)
+        val groups = r.effectiveWeekdays.sorted().groupBy { genders[it.value - 1] }
+        // Gruppen mit Komma statt „und“ – sonst verschwimmen sie: „il primo lunedì, la prima domenica“.
+        return groups.map { (gender, days) ->
+                val words = texts.array(if (gender == "f") R.array.ordinals_f else R.array.ordinals_m)
+                s(R.string.weekday_group, joinAnd(ords.map { words[ordinalIndex(it)] }), joinAnd(days.map(::longDay)))
+            }.joinToString(s(R.string.list_separator))
     }
 
     /** Kurze Beschreibung der Regel für die Weckerliste. */
@@ -94,31 +154,30 @@ object Format {
         val n = r.interval.coerceAtLeast(1)
         val start = r.startDate ?: today
         val base = when (r.type) {
-            RepeatType.ONCE -> r.startDate?.let { "Einmalig, ${relativeDay(it, today)}" } ?: "Einmalig"
-            RepeatType.DAILY -> if (n == 1) "Täglich" else "Jeden $n. Tag"
+            RepeatType.ONCE -> r.startDate?.let { s(R.string.desc_once_on, inSentence(relativeDay(it, today), it, today)) } ?: s(R.string.desc_once)
+            RepeatType.DAILY -> if (n == 1) s(R.string.desc_daily) else s(R.string.desc_every_n_days, n)
             RepeatType.WEEKLY -> {
                 val days = weekdayList(r.effectiveWeekdays)
                 when {
-                    n == 1 && r.effectiveWeekdays.size == 7 -> "Täglich"
+                    n == 1 && r.effectiveWeekdays.size == 7 -> s(R.string.desc_daily)
                     n == 1 -> days
-                    else -> "Jede $n. Woche: $days"
+                    else -> s(R.string.desc_every_n_weeks, n, if (r.effectiveWeekdays.size == 7) days.lowercase(texts.locale) else days)
                 }
             }
-            RepeatType.MONTHLY_DAY -> {
-                val day = if (r.dayOfMonth == LAST_DAY) "letzten Tag" else "${r.dayOfMonth}."
-                if (n == 1) "Monatlich am $day" else "Jeden $n. Monat am $day"
+            RepeatType.MONTHLY_DAY -> when {
+                r.dayOfMonth == LAST_DAY && n == 1 -> s(R.string.desc_monthly_last_day)
+                r.dayOfMonth == LAST_DAY -> s(R.string.desc_every_n_months_last_day, n)
+                n == 1 -> s(R.string.desc_monthly_on_day, r.dayOfMonth)
+                else -> s(R.string.desc_every_n_months_on_day, n, r.dayOfMonth)
             }
-            RepeatType.MONTHLY_WEEKDAY -> {
-                val ords = r.ordinals.sortedBy { if (it == LAST_ORDINAL) 99 else it }.map(::ordinalWord)
-                val days = joinAnd(r.effectiveWeekdays.sorted().map(::longDay))
-                if (n == 1) "Jeden ${joinAnd(ords)} $days im Monat"
-                else "Jeden $n. Monat am ${joinAnd(ords)} $days"
-            }
+            RepeatType.MONTHLY_WEEKDAY ->
+                if (n == 1) s(R.string.desc_monthly_weekday, weekdayOrdinals(r))
+                else s(R.string.desc_every_n_months_weekday, n, weekdayOrdinals(r))
             RepeatType.YEARLY -> {
-                val d = "${start.dayOfMonth}. ${MONTHS[start.monthValue - 1]}"
-                if (n == 1) "Jährlich am $d" else "Jedes $n. Jahr am $d"
+                val d = pattern(R.string.fmt_day_month).format(start)
+                if (n == 1) s(R.string.desc_yearly, d) else s(R.string.desc_every_n_years, n, d)
             }
         }
-        return if (r.isRepeating && r.endDate != null) "$base · bis ${date(r.endDate)}" else base
+        return if (r.isRepeating && r.endDate != null) s(R.string.desc_with_end, base, date(r.endDate)) else base
     }
 }

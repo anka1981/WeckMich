@@ -1,0 +1,1 @@
+First F-Droid release: available in English, German, French, Spanish, Italian, Portuguese and Dutch (follows the system language), new help page, turn the phone over to snooze, times follow the 12/24-hour setting.

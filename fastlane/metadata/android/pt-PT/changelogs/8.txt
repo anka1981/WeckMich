@@ -1,0 +1,1 @@
+Primeira versão no F-Droid: disponível em inglês, alemão, francês, espanhol, italiano, português e neerlandês (segue o idioma do sistema), nova página de ajuda, virar o telefone para adiar, as horas seguem a definição de 12/24 horas.

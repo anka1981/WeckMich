@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ImpliedQuantity: Einheiten ohne Zahl stehen neben einem Zähler ab 1. MissingQuantity: „many“ gilt erst ab einer Million. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity,MissingQuantity">
+    <string name="app_name">Svegliami</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Annulla</string>
+    <string name="done">Fine</string>
+    <string name="back">Indietro</string>
+    <string name="alarm_default_label">Sveglia</string>
+    <string name="snooze">Posticipa</string>
+    <string name="dismiss">Ferma</string>
+    <string name="today">Oggi</string>
+    <string name="tomorrow">Domani</string>
+    <string name="never">Mai</string>
+    <string name="time">Ora</string>
+    <string name="decrease">Riduci %s</string>
+    <string name="increase">Aumenta %s</string>
+
+    <string name="alarms_title">Sveglie</string>
+    <string name="settings">Impostazioni</string>
+    <string name="help">Guida</string>
+    <string name="add_alarm">Aggiungi sveglia</string>
+    <string name="no_alarms">Ancora nessuna sveglia</string>
+    <string name="no_further_occurrence">Questa regola non ha altre ricorrenze</string>
+    <string name="alarm_rings_in">La sveglia suonerà %s</string>
+    <string name="ringing_banner">Sta suonando: %1$s %2$s</string>
+    <string name="setting_open_failed">Impossibile aprire l\'impostazione</string>
+    <string name="change_time">Cambia ora</string>
+    <string name="alarm_switch">Sveglia %s</string>
+    <string name="expand">Espandi</string>
+    <string name="collapse">Comprimi</string>
+    <string name="repeat">Ripetizione</string>
+    <string name="pause">Sospendi</string>
+    <string name="pause_hint">Sospendi per giorni, settimane o mesi</string>
+    <string name="label">Etichetta</string>
+    <string name="label_add">Aggiungi</string>
+    <string name="label_placeholder">ad es. Portare fuori i rifiuti</string>
+    <string name="sound">Suoneria sveglia</string>
+    <string name="default_value">Predefinito (%s)</string>
+    <string name="ramp_title">Volume crescente</string>
+    <string name="vibrate">Vibrazione</string>
+    <string name="delete">Elimina</string>
+    <string name="snooze_length">Durata posticipo</string>
+    <string name="snoozing_until">Posticipata fino alle %s</string>
+    <string name="no_more_occurrences">Nessun\'altra ricorrenza</string>
+
+    <string name="paused_through">Sospesa fino a %s incluso</string>
+    <string name="skipped_none">Nessuna ricorrenza viene saltata.</string>
+    <plurals name="skipped">
+        <item quantity="one">Viene saltata %1$d ricorrenza: %2$s</item>
+        <item quantity="other">Vengono saltate %1$d ricorrenze: %2$s</item>
+    </plurals>
+    <plurals name="skipped_more">
+        <item quantity="one">e un\'altra</item>
+        <item quantity="other">e altre %d</item>
+    </plurals>
+    <string name="next_occurrence">Prossima ricorrenza: %1$s, %2$s</string>
+    <string name="no_occurrence_after">Dopo non ci sono altre ricorrenze.</string>
+    <string name="pause_title">Sospendi sveglia</string>
+    <string name="pause_current">Attuale</string>
+    <string name="pause_end">Termina pausa</string>
+    <string name="pause_heading_period">Sospendi da oggi per</string>
+    <string name="pause_heading_occurrences">Salta le prossime ricorrenze:</string>
+    <string name="pause_heading_replace_period">Nuova pausa (sostituisce quella attuale) – sospendi da oggi per</string>
+    <string name="pause_heading_replace_occurrences">Nuova pausa (sostituisce quella attuale) – salta le prossime ricorrenze:</string>
+    <string name="pause_count">numero</string>
+    <string name="pause_preview">Sospesa fino a %s incluso</string>
+    <string name="pause_until_date">Oppure fino a una data …</string>
+    <string name="pause_replace">Sostituisci pausa</string>
+    <string name="pause_confirm">Sospendi</string>
+    <plurals name="unit_days">
+        <item quantity="one">giorno</item>
+        <item quantity="other">giorni</item>
+    </plurals>
+    <plurals name="unit_weeks">
+        <item quantity="one">settimana</item>
+        <item quantity="other">settimane</item>
+    </plurals>
+    <plurals name="unit_months">
+        <item quantity="one">mese</item>
+        <item quantity="other">mesi</item>
+    </plurals>
+    <plurals name="unit_years">
+        <item quantity="one">anno</item>
+        <item quantity="other">anni</item>
+    </plurals>
+    <plurals name="unit_occurrences">
+        <item quantity="one">ricorrenza</item>
+        <item quantity="other">ricorrenze</item>
+    </plurals>
+
+    <string name="type_once">Una volta</string>
+    <string name="type_daily">Ogni giorno / ogni n giorni</string>
+    <string name="type_weekly">Ogni settimana / ogni n settimane</string>
+    <string name="type_monthly_day">Ogni mese in un giorno</string>
+    <string name="type_monthly_weekday">Ogni mese in un giorno della settimana</string>
+    <string name="type_yearly">Ogni anno</string>
+    <string name="hint_once">Suona una sola volta</string>
+    <string name="hint_daily">ad es. ogni 3 giorni</string>
+    <string name="hint_weekly">ad es. il lunedì a settimane alterne – settimane alterne, turni od orario scolastico</string>
+    <string name="hint_monthly_day">ad es. il 15 o l\'ultimo giorno</string>
+    <string name="hint_monthly_weekday">ad es. il primo martedì del mese</string>
+    <string name="hint_yearly">ad es. ogni anno l\'8 ott.</string>
+    <string name="interval">Intervallo</string>
+    <plurals name="interval_prefix_days">
+        <item quantity="one">Ogni</item>
+        <item quantity="other">Ogni</item>
+    </plurals>
+    <plurals name="interval_prefix_weeks">
+        <item quantity="one">Ogni</item>
+        <item quantity="other">Ogni</item>
+    </plurals>
+    <plurals name="interval_prefix_months">
+        <item quantity="one">Ogni</item>
+        <item quantity="other">Ogni</item>
+    </plurals>
+    <plurals name="interval_prefix_years">
+        <item quantity="one">Ogni</item>
+        <item quantity="other">Ogni</item>
+    </plurals>
+    <string name="on_these_days">In questi giorni</string>
+    <string name="on_day">Il giorno</string>
+    <string name="day_of_month">%d</string>
+    <string name="day_of_month_what">giorno</string>
+    <string name="last_day_of_month">Ultimo giorno del mese</string>
+    <string name="short_month_hint">Nei mesi più brevi la sveglia suona l\'ultimo giorno del mese.</string>
+    <string name="which_in_month">Quale del mese</string>
+    <string name="weekday">Giorno della settimana</string>
+    <string name="yearly_hint">La sveglia suona ogni anno nel giorno e nel mese della data di inizio.</string>
+    <string name="starts_on">Inizia il</string>
+    <string name="interval_counted_from">%s – l\'intervallo viene contato da qui</string>
+    <string name="ends">Termina</string>
+    <string name="ends_after">Dopo %s</string>
+    <string name="no_end">Nessuna fine</string>
+    <string name="date">Data</string>
+    <string name="next_time_reached">La prossima volta che arriva quest\'ora</string>
+    <string name="no_date">Nessuna data</string>
+    <string name="upcoming">Prossime ricorrenze</string>
+
+    <string name="default_snooze">Durata posticipo predefinita</string>
+    <string name="default_snooze_sub">%s – per le sveglie senza una durata propria</string>
+    <string name="ring_for">La sveglia si ferma dopo</string>
+    <string name="ring_for_sub">%s senza risposta – poi ricevi l\'avviso «Sveglia persa»</string>
+    <string name="ring_for_never_sub">Suona finché non rispondi</string>
+    <string name="default_ramp">Predefinito per «Volume crescente»</string>
+    <string name="default_ramp_sub">%s – per le sveglie senza un\'impostazione propria</string>
+    <string name="ramp_dialog_title">Aumenta gradualmente il volume</string>
+    <string name="flip_to_snooze">Capovolgi per posticipare</string>
+    <string name="flip_to_snooze_sub">Appoggiando il telefono con lo schermo verso il basso, la sveglia che suona viene posticipata. Per posticipare di nuovo più tardi, prima sollevalo.</string>
+    <string name="reliability">Affidabilità</string>
+    <string name="all_set">Tutto pronto – le sveglie suonano anche con Non disturbare e il risparmio energetico.</string>
+    <string name="test_advice">È meglio provare la sveglia una volta con lo schermo bloccato e Non disturbare attivo. Importante: «Forza interruzione» nelle informazioni sull\'app elimina tutte le sveglie programmate finché non riapri l\'app.</string>
+    <string name="test_alarm_label">Sveglia di prova</string>
+    <string name="test_alarm_toast">La sveglia di prova suona tra 1 minuto – blocca subito lo schermo</string>
+    <string name="test_alarm_button">Sveglia di prova tra 1 minuto</string>
+
+    <string name="ramp_off">Disattivato – subito volume massimo</string>
+    <plurals name="ramp_seconds">
+        <item quantity="one">Aumenta in %d secondo</item>
+        <item quantity="other">Aumenta in %d secondi</item>
+    </plurals>
+    <plurals name="ramp_minutes">
+        <item quantity="one">Aumenta in %d minuto</item>
+        <item quantity="other">Aumenta in %d minuti</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d minuto</item>
+        <item quantity="other">%d minuti</item>
+    </plurals>
+
+    <string name="default_sound">Suono sveglia predefinito</string>
+    <string name="default_sound_named">Suono sveglia predefinito (%s)</string>
+    <string name="builtin_sound">Bip integrato</string>
+    <string name="custom_file">File personale</string>
+    <string name="alarm_sounds">Suoni sveglia</string>
+    <string name="ringtones">Suonerie</string>
+    <string name="file_import_failed">Impossibile usare il file (troppo grande o non leggibile).</string>
+    <string name="file_importing">Importazione del file …</string>
+    <string name="file_choose">Scegli un tuo file audio …</string>
+    <string name="sounds_loading">Caricamento suoni …</string>
+
+    <string name="channel_ringing">Sveglia che suona</string>
+    <string name="channel_ringing_desc">Mostra la sveglia che suona, anche nella schermata di blocco</string>
+    <string name="channel_emergency">Sveglia (emergenza)</string>
+    <string name="channel_emergency_desc">Suona se il suono normale della sveglia non può partire</string>
+    <string name="channel_missed">Sveglie perse</string>
+    <string name="channel_missed_desc">Avviso quando una sveglia è stata persa o si è fermata senza risposta</string>
+    <string name="emergency_text">Il suono normale della sveglia non è potuto partire.</string>
+    <string name="missed_title">Sveglia persa: %s</string>
+    <string name="missed_timeout">Fermata dopo %s senza risposta</string>
+    <string name="missed_interrupted">La suoneria è stata interrotta dal sistema</string>
+    <string name="missed_replaced">Sostituita da un\'altra sveglia</string>
+    <string name="missed_not_fired">Non è suonata – dispositivo spento o ora modificata</string>
+
+    <string name="action_allow">Consenti</string>
+    <string name="action_change">Modifica</string>
+    <string name="action_sounds">Suono</string>
+    <string name="action_storage">Memoria</string>
+    <string name="action_exception">Eccezione</string>
+    <string name="issue_notifications_title">Le notifiche sono disattivate</string>
+    <string name="issue_notifications_text">Senza di esse la sveglia che suona non compare sullo schermo.</string>
+    <string name="issue_fullscreen_title">Visualizzazione a schermo intero non consentita</string>
+    <string name="issue_fullscreen_text">La sveglia non può quindi comparire sopra la schermata di blocco.</string>
+    <string name="issue_exact_title">Sveglie esatte non consentite</string>
+    <string name="issue_exact_text">Senza questa autorizzazione Android può ritardare la sveglia.</string>
+    <string name="issue_volume_title">Il volume della sveglia è a 0</string>
+    <string name="issue_volume_text">La sveglia vibrerebbe soltanto. Alza il volume della sveglia nelle impostazioni audio.</string>
+    <string name="issue_dnd_silent_title">Non disturbare è impostato su «Silenzio totale»</string>
+    <string name="issue_dnd_silent_text">In questa modalità Android non fa suonare neanche le sveglie.</string>
+    <string name="issue_dnd_blocks_title">Non disturbare blocca le sveglie</string>
+    <string name="issue_dnd_blocks_text">Consenti la categoria «Sveglie» nella modalità Non disturbare attiva.</string>
+    <string name="issue_restricted_title">L\'utilizzo della batteria è «Con restrizioni»</string>
+    <string name="issue_restricted_text">Alcuni produttori bloccano allora la sveglia in background. «Ottimizzato» o «Senza restrizioni» è più sicuro.</string>
+    <string name="issue_channel_title">Notifica «Sveglia che suona» ridotta</string>
+    <string name="issue_channel_text">La sveglia che suona non compare quindi sullo schermo. Reimposta la categoria su «Mostra sullo schermo/Urgente».</string>
+    <string name="issue_damaged_title">Le sveglie salvate erano danneggiate</string>
+    <string name="issue_damaged_text">Alcune sveglie non sono state lette – controlla l\'elenco e ricrea le sveglie mancanti. Le sveglie già programmate suonano comunque.</string>
+    <string name="issue_write_title">Impossibile salvare le sveglie</string>
+    <string name="issue_write_text">Probabilmente la memoria è piena. Altrimenti dopo un riavvio mancheranno le ultime modifiche.</string>
+    <string name="issue_battery_title">L\'ottimizzazione della batteria è attiva</string>
+    <string name="issue_battery_text">Android fa comunque suonare le sveglie, ma alcuni produttori chiudono l\'app in background. Un\'eccezione rende la sveglia più affidabile su questi dispositivi.</string>
+
+    <string name="fmt_date">EEE d MMM</string>
+    <string name="fmt_date_year">EEE d MMM yyyy</string>
+    <string name="fmt_day_month">d MMM</string>
+    <string name="until">tra %s</string>
+    <string name="until_less_than_minute">tra meno di 1 min</string>
+    <plurals name="until_days">
+        <item quantity="one">%d giorno</item>
+        <item quantity="other">%d giorni</item>
+    </plurals>
+    <plurals name="hours_short">
+        <item quantity="one">%d h</item>
+        <item quantity="other">%d h</item>
+    </plurals>
+    <plurals name="minutes_short">
+        <item quantity="one">%d min</item>
+        <item quantity="other">%d min</item>
+    </plurals>
+    <string name="list_separator">", "</string>
+    <string name="list_and">%1$s e %2$s</string>
+    <string name="every_day">Ogni giorno</string>
+    <string name="workdays">lun–ven</string>
+    <string-array name="weekdays_short">
+        <item>Lu</item>
+        <item>Ma</item>
+        <item>Me</item>
+        <item>Gi</item>
+        <item>Ve</item>
+        <item>Sa</item>
+        <item>Do</item>
+    </string-array>
+    <string-array name="weekdays_abbr">
+        <item>lun</item>
+        <item>mar</item>
+        <item>mer</item>
+        <item>gio</item>
+        <item>ven</item>
+        <item>sab</item>
+        <item>dom</item>
+    </string-array>
+    <string-array name="weekdays_long">
+        <item>lunedì</item>
+        <item>martedì</item>
+        <item>mercoledì</item>
+        <item>giovedì</item>
+        <item>venerdì</item>
+        <item>sabato</item>
+        <item>domenica</item>
+    </string-array>
+    <string-array name="weekday_gender">
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>m</item>
+        <item>f</item>
+    </string-array>
+    <string-array name="ordinals_m">
+        <item>il primo</item>
+        <item>il secondo</item>
+        <item>il terzo</item>
+        <item>il quarto</item>
+        <item>l\'ultimo</item>
+    </string-array>
+    <string-array name="ordinals_f">
+        <item>la prima</item>
+        <item>la seconda</item>
+        <item>la terza</item>
+        <item>la quarta</item>
+        <item>l\'ultima</item>
+    </string-array>
+    <string-array name="ordinal_chips">
+        <item>1º</item>
+        <item>2º</item>
+        <item>3º</item>
+        <item>4º</item>
+        <item>Ultimo</item>
+    </string-array>
+    <string name="weekday_group">%1$s %2$s</string>
+    <string name="desc_once">Una volta</string>
+    <string name="desc_once_on">Una volta, %s</string>
+    <string name="desc_daily">Ogni giorno</string>
+    <string name="desc_every_n_days">Ogni %d giorni</string>
+    <string name="desc_every_n_weeks">Ogni %1$d settimane: %2$s</string>
+    <string name="desc_monthly_on_day">Ogni mese il giorno %d</string>
+    <string name="desc_monthly_last_day">Ogni mese l\'ultimo giorno</string>
+    <string name="desc_every_n_months_on_day">Ogni %1$d mesi il giorno %2$d</string>
+    <string name="desc_every_n_months_last_day">Ogni %d mesi l\'ultimo giorno</string>
+    <string name="desc_monthly_weekday">Ogni mese: %s</string>
+    <string name="desc_every_n_months_weekday">Ogni %1$d mesi: %2$s</string>
+    <string name="desc_yearly">Ogni anno il %s</string>
+    <string name="desc_every_n_years">Ogni %1$d anni il %2$s</string>
+    <string name="desc_with_end">%1$s · fino a %2$s</string>
+
+    <string name="help_repeat_title">Sveglie ripetute</string>
+    <string name="help_repeat_text">Tocca la riga della ripetizione di una sveglia per scegliere una regola:\n• Una volta – in una data o la prossima volta che arriva l\'ora\n• Ogni n giorni – ad es. ogni 3 giorni\n• Ogni n settimane nei giorni scelti – ad es. lunedì e giovedì a settimane alterne\n• Ogni mese in un giorno – ad es. il 15 o l\'ultimo giorno\n• Ogni mese in un giorno della settimana – ad es. il primo e il terzo giovedì o l\'ultimo venerdì\n• Ogni anno\nOgni regola può avere una data di fine. L\'anteprima mostra le prossime ricorrenze.\nI cerchi dei giorni sulla scheda funzionano come nell\'orologio di Android.</string>
+    <string name="help_timetable_title">Settimane alterne e orari</string>
+    <string name="help_timetable_text">Per un ritmo che cambia da una settimana all\'altra – settimane A/B a scuola, turni del mattino e del pomeriggio, l\'orario delle lezioni all\'università – crea una sveglia per ogni schema con «Ogni 2 settimane», ad es. alle 6:00 da lunedì a mercoledì e alle 8:30 giovedì e venerdì.\nLa data di inizio decide quale settimana conta: l\'intervallo viene contato dalla settimana della data di inizio. Per l\'altra settimana, dai a una seconda sveglia una data di inizio una settimana dopo.\nFunzionano anche cicli più lunghi, ad es. ogni 3 o 4 settimane.</string>
+    <string name="help_pause_title">Sospendere</string>
+    <string name="help_pause_text">Le sveglie ripetute si possono sospendere – per esempio durante le vacanze. Scegli giorni, settimane o mesi a partire da oggi, un numero di ricorrenze da saltare o un\'ultima data. La finestra mostra quali ricorrenze vengono saltate. Dopo la pausa la sveglia riprende da sola.</string>
+    <string name="help_ringing_title">Posticipo, volume e suono</string>
+    <string name="help_ringing_text">La durata del posticipo e il «Volume crescente» si possono impostare per ogni sveglia o come predefiniti nelle impostazioni. Una sveglia che suona si ferma da sola dopo il tempo scelto nelle impostazioni e mostra poi l\'avviso «Sveglia persa».\nPuoi usare i suoni sveglia e le suonerie del dispositivo o un tuo file audio. Il tuo file viene copiato nell\'app, così suona anche dopo un riavvio.</string>
+    <string name="help_reliability_title">Affidabilità</string>
+    <string name="help_reliability_text">Le sveglie usano la funzione sveglia di Android e suonano in modalità Doze, con il risparmio energetico e con Non disturbare (se lì le sveglie sono consentite). Dopo un riavvio funzionano anche prima del primo sblocco.\nL\'app controlla le autorizzazioni, il volume della sveglia e Non disturbare e mostra avvisi nell\'elenco e nelle impostazioni.\nImportante: «Forza interruzione» nelle informazioni sull\'app elimina tutte le sveglie programmate finché non riapri l\'app.\nSe il suono normale non può partire, suona al suo posto una sveglia di emergenza con notifica. Se una sveglia non è potuta suonare (dispositivo spento, ora modificata), ricevi l\'avviso «Sveglia persa».\nSuggerimento: prova una volta la sveglia di prova nelle impostazioni con lo schermo bloccato.</string>
+    <string name="help_flip_title">Capovolgi per posticipare</string>
+    <string name="help_flip_text">Quando una sveglia suona, appoggia il telefono con lo schermo verso il basso per posticiparla. Trascorso il tempo di posticipo, suona di nuovo. Se il telefono è ancora capovolto, sollevalo e riappoggialo – oppure tocca «Posticipa». Il sensore di movimento è attivo solo mentre suona una sveglia. Puoi disattivare questa funzione nelle impostazioni.</string>
+    <string name="help_privacy_title">Privacy</string>
+    <string name="help_privacy_text">L\'app non ha l\'autorizzazione di accesso a Internet. Tutte le sveglie restano sul tuo dispositivo.</string>
+    <string name="help_about_title">Informazioni</string>
+    <string name="help_about_text">Versione %1$s\nSoftware libero con licenza GNU General Public License v3.0.\nCodice sorgente e segnalazioni: %2$s</string>
+</resources>

@@ -1,0 +1,31 @@
+<p><b>Una sveglia che segue il tuo ritmo, anche quando cambia di settimana in settimana.</b></p>
+
+<p>Settimane A/B a scuola, turni del mattino e del pomeriggio, un orario universitario diverso a settimane alterne: con Svegliami imposti ogni sveglia una sola volta con una regola flessibile e lei suona semplicemente nei giorni giusti. Basta attivare e disattivare sveglie ogni domenica sera.</p>
+
+<p><b>Regole che l'orologio integrato non sa gestire</b></p>
+<ul>
+<li><b>Ogni n settimane</b> nei giorni scelti – ad es. lunedì e giovedì a settimane alterne; la data di inizio decide quale settimana conta</li>
+<li><b>Ogni mese in un giorno della settimana</b> – ad es. il 1º martedì, il 1º e il 3º giovedì o l'ultimo venerdì del mese</li>
+<li><b>Ogni mese in un giorno</b> – ad es. il 15 o l'ultimo giorno del mese</li>
+<li>Ogni n giorni, ogni anno o una volta sola – ciascuna con data di inizio e data di fine facoltativa</li>
+</ul>
+<p>Un'anteprima mostra le prossime ricorrenze, così vedi subito se la regola è giusta.</p>
+
+<p><b>Sospendere invece di eliminare</b><br/>
+Vai in vacanza? Sospendi le sveglie ripetute per giorni, settimane o mesi, per un certo numero di ricorrenze o fino a una data. L'app mostra quali ricorrenze vengono saltate e poi riprende da sola.</p>
+
+<p><b>Il risveglio</b></p>
+<ul>
+<li>Capovolgi il telefono per posticipare</li>
+<li>Durata del posticipo e volume crescente per ogni sveglia o come predefiniti</li>
+<li>Suoni sveglia, suonerie del dispositivo o un tuo file audio</li>
+<li>Suona in modo affidabile in modalità Doze, con il risparmio energetico e con Non disturbare, e dopo un riavvio anche prima del primo sblocco</li>
+<li>Controlla autorizzazioni, volume della sveglia e Non disturbare e ti avvisa di tutto ciò che impedirebbe alla sveglia di suonare</li>
+<li>Avviso «Sveglia persa» se il dispositivo era spento o la sveglia si è fermata senza risposta</li>
+<li>Sveglia di prova tra 1 minuto</li>
+</ul>
+
+<p><b>Privacy</b><br/>
+Nessuna autorizzazione Internet, nessuna pubblicità, nessun tracciamento. Le tue sveglie restano sul tuo dispositivo.</p>
+
+<p>Disponibile in inglese, tedesco, francese, spagnolo, italiano, portoghese e olandese; l'app segue la lingua di sistema.</p>

@@ -1,5 +1,10 @@
 package com.andik.wecker.ui
 
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material3.Switch
+import androidx.compose.ui.semantics.Role
+import com.andik.wecker.R
+import androidx.compose.ui.res.stringResource
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -56,52 +61,65 @@ fun SettingsScreen(onBack: () -> Unit) {
     var issues by remember { mutableStateOf(emptyList<Issue>()) }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { issues = Reliability.issues(context) }
 
-    val snoozeOptions = SNOOZE_CHOICES.map { it to "$it Minuten" }
-    val ringOptions = listOf(1, 5, 10, 15, 20, 30).map { it to "$it Minuten" } + (0 to "Nie")
+    val snoozeOptions = SNOOZE_CHOICES.map { it to Format.minutes(it) }
+    val ringOptions = listOf(1, 5, 10, 15, 20, 30).map { it to Format.minutes(it) } + (0 to stringResource(R.string.never))
     val rampOptions = RAMP_CHOICES.map { it to Format.ramp(it) }
+    val snoozeTitle = stringResource(R.string.snooze_length)
+    val ringTitle = stringResource(R.string.ring_for)
+    val rampTitle = stringResource(R.string.ramp_dialog_title)
+    val testLabel = stringResource(R.string.test_alarm_label)
     fun label(options: List<Pair<Int, String>>, v: Int) = options.firstOrNull { it.first == v }?.second ?: "$v"
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Einstellungen") },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Zurück") } },
+                title = { Text(stringResource(R.string.settings)) },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back)) } },
             )
         },
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState())) {
             ListItem(
-                headlineContent = { Text("Standard-Schlummerdauer") },
-                supportingContent = { Text(label(snoozeOptions, settings.snoozeMinutes) + " – gilt für Wecker ohne eigene Dauer") },
+                headlineContent = { Text(stringResource(R.string.default_snooze)) },
+                supportingContent = { Text(stringResource(R.string.default_snooze_sub, label(snoozeOptions, settings.snoozeMinutes))) },
                 modifier = Modifier.clickable {
-                    choice = Choice("Schlummerdauer", snoozeOptions, settings.snoozeMinutes) {
+                    choice = Choice(snoozeTitle, snoozeOptions, settings.snoozeMinutes) {
                         AlarmStore.updateSettings(AlarmStore.settings.value.copy(snoozeMinutes = it))
                     }
                 },
             )
             ListItem(
-                headlineContent = { Text("Wecker verstummt nach") },
+                headlineContent = { Text(stringResource(R.string.ring_for)) },
                 supportingContent = {
-                    Text(label(ringOptions, settings.ringMinutes) + " ohne Reaktion – danach gibt es den Hinweis „Verpasster Wecker“")
+                    Text(if (settings.ringMinutes == 0) stringResource(R.string.ring_for_never_sub) else stringResource(R.string.ring_for_sub, label(ringOptions, settings.ringMinutes)))
                 },
                 modifier = Modifier.clickable {
-                    choice = Choice("Wecker verstummt nach", ringOptions, settings.ringMinutes) {
+                    choice = Choice(ringTitle, ringOptions, settings.ringMinutes) {
                         AlarmStore.updateSettings(AlarmStore.settings.value.copy(ringMinutes = it))
                     }
                 },
             )
             ListItem(
-                headlineContent = { Text("Standard für „Lauter werden“") },
-                supportingContent = { Text(label(rampOptions, settings.rampSeconds) + " – gilt für Wecker ohne eigene Einstellung") },
+                headlineContent = { Text(stringResource(R.string.default_ramp)) },
+                supportingContent = { Text(stringResource(R.string.default_ramp_sub, label(rampOptions, settings.rampSeconds))) },
                 modifier = Modifier.clickable {
-                    choice = Choice("Lautstärke langsam erhöhen", rampOptions, settings.rampSeconds) {
+                    choice = Choice(rampTitle, rampOptions, settings.rampSeconds) {
                         AlarmStore.updateSettings(AlarmStore.settings.value.copy(rampSeconds = it))
                     }
                 },
             )
 
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.flip_to_snooze)) },
+                supportingContent = { Text(stringResource(R.string.flip_to_snooze_sub)) },
+                trailingContent = { Switch(checked = settings.flipToSnooze, onCheckedChange = null) },
+                modifier = Modifier.toggleable(settings.flipToSnooze, role = Role.Switch) {
+                    AlarmStore.updateSettings(AlarmStore.settings.value.copy(flipToSnooze = it))
+                },
+            )
+
             Text(
-                "Zuverlässigkeit",
+                stringResource(R.string.reliability),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(start = 16.dp, top = 24.dp, bottom = 8.dp),
@@ -110,14 +128,12 @@ fun SettingsScreen(onBack: () -> Unit) {
                 if (issues.isEmpty()) {
                     Row(Modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Filled.CheckCircle, null, tint = MaterialTheme.colorScheme.primary)
-                        Text("Alles eingerichtet – Wecker klingeln auch im Ruhe- und Stromsparmodus.", Modifier.padding(start = 12.dp))
+                        Text(stringResource(R.string.all_set), Modifier.padding(start = 12.dp))
                     }
                 }
                 issues.forEach { IssueCard(it) }
                 Text(
-                    "Teste den Wecker am besten einmal bei gesperrtem Bildschirm und eingeschaltetem " +
-                        "„Nicht stören“. Wichtig: „Stopp erzwingen“ in den App-Infos löscht alle geplanten Wecker, " +
-                        "bis du die App wieder öffnest.",
+                    stringResource(R.string.test_advice),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(4.dp),
@@ -129,14 +145,14 @@ fun SettingsScreen(onBack: () -> Unit) {
                             context,
                             Alarm(
                                 id = AlarmStore.nextId(), hour = t.hour, minute = t.minute, enabled = false,
-                                label = "Probewecker", recurrence = Recurrence(), temporary = true,
+                                label = testLabel, recurrence = Recurrence(), temporary = true,
                                 snoozeUntil = System.currentTimeMillis() + 60_000L,
                             ),
                         )
-                        Toast.makeText(context, "Probewecker klingelt in 1 Minute – jetzt Bildschirm sperren", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, R.string.test_alarm_toast, Toast.LENGTH_LONG).show()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                ) { Text("Probewecker in 1 Minute") }
+                ) { Text(stringResource(R.string.test_alarm_button)) }
             }
         }
     }

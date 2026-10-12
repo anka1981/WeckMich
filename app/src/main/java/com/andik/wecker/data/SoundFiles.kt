@@ -41,6 +41,12 @@ object SoundFiles {
         }
     }
 
+    /**
+     * Der eingebaute Piepton – über den Ressourcennamen, nicht die ID: Die ID kann sich mit jedem Build
+     * ändern, und ein Kanalton lässt sich nach dem Anlegen des Kanals nie mehr ändern.
+     */
+    fun builtinUri(context: Context) = "android.resource://${context.packageName}/raw/fallback_alarm"
+
     /** Entfernt kopierte Töne, die kein Wecker mehr verwendet. */
     fun cleanup(context: Context, inUse: Collection<String?>) {
         val used = inUse.filterNotNull().toSet()

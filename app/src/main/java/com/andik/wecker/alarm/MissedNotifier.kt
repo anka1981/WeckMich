@@ -24,15 +24,19 @@ object MissedNotifier {
 
     fun createChannel(context: Context) {
         val nm = context.getSystemService(NotificationManager::class.java)
-        if (nm.getNotificationChannel(CHANNEL_ID) != null) return
         nm.createNotificationChannel(
-            NotificationChannel(CHANNEL_ID, "Verpasste Wecker", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                description = "Hinweis, wenn ein Wecker verpasst wurde oder ohne Reaktion verstummt ist"
+            NotificationChannel(CHANNEL_ID, context.getString(R.string.channel_missed), NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = context.getString(R.string.channel_missed_desc)
             },
         )
     }
 
+    /** Scheitert nie nach außen – der Aufrufer ist oft gerade dabei, einen Wecker klingeln zu lassen. */
     fun notify(context: Context, alarm: Alarm, at: Long, reason: String) {
+        runCatching { post(context, alarm, at, reason) }
+    }
+
+    private fun post(context: Context, alarm: Alarm, at: Long, reason: String) {
         if (Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
             PackageManager.PERMISSION_GRANTED
@@ -43,7 +47,7 @@ object MissedNotifier {
             context, 0, Intent(context, MainActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
-        val title = "Verpasster Wecker: ${Format.time(time)}" + alarm.label.takeIf { it.isNotBlank() }?.let { " – $it" }.orEmpty()
+        val title = context.getString(R.string.missed_title, Format.time(time)) + alarm.label.takeIf { it.isNotBlank() }?.let { " – $it" }.orEmpty()
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_alarm)
             .setContentTitle(title)

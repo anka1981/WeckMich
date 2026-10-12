@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ImpliedQuantity: Einheiten ohne Zahl stehen neben einem Zähler ab 1. MissingQuantity: „many“ gilt erst ab einer Million. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity,MissingQuantity">
+    <string name="app_name">Acorda-me</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Cancelar</string>
+    <string name="done">Concluído</string>
+    <string name="back">Voltar</string>
+    <string name="alarm_default_label">Alarme</string>
+    <string name="snooze">Adiar</string>
+    <string name="dismiss">Parar</string>
+    <string name="today">Hoje</string>
+    <string name="tomorrow">Amanhã</string>
+    <string name="never">Nunca</string>
+    <string name="time">Hora</string>
+    <string name="decrease">Diminuir %s</string>
+    <string name="increase">Aumentar %s</string>
+
+    <string name="alarms_title">Alarmes</string>
+    <string name="settings">Definições</string>
+    <string name="help">Ajuda</string>
+    <string name="add_alarm">Adicionar alarme</string>
+    <string name="no_alarms">Ainda não há alarmes</string>
+    <string name="no_further_occurrence">Esta regra não tem mais ocorrências</string>
+    <string name="alarm_rings_in">O alarme toca %s</string>
+    <string name="ringing_banner">A tocar: %1$s %2$s</string>
+    <string name="setting_open_failed">Não foi possível abrir a definição</string>
+    <string name="change_time">Alterar hora</string>
+    <string name="alarm_switch">Alarme %s</string>
+    <string name="expand">Expandir</string>
+    <string name="collapse">Recolher</string>
+    <string name="repeat">Repetição</string>
+    <string name="pause">Suspender</string>
+    <string name="pause_hint">Suspender durante dias, semanas ou meses</string>
+    <string name="label">Etiqueta</string>
+    <string name="label_add">Adicionar</string>
+    <string name="label_placeholder">p. ex. Pôr o lixo fora</string>
+    <string name="sound">Som do alarme</string>
+    <string name="default_value">Predefinido (%s)</string>
+    <string name="ramp_title">Aumentar gradualmente</string>
+    <string name="vibrate">Vibrar</string>
+    <string name="delete">Eliminar</string>
+    <string name="snooze_length">Duração do adiamento</string>
+    <string name="snoozing_until">Adiado até %s</string>
+    <string name="no_more_occurrences">Sem mais ocorrências</string>
+
+    <string name="paused_through">Suspenso até %s (inclusive)</string>
+    <string name="skipped_none">Nenhuma ocorrência é ignorada.</string>
+    <plurals name="skipped">
+        <item quantity="one">%1$d ocorrência é ignorada: %2$s</item>
+        <item quantity="other">%1$d ocorrências são ignoradas: %2$s</item>
+    </plurals>
+    <plurals name="skipped_more">
+        <item quantity="one">e mais %d</item>
+        <item quantity="other">e mais %d</item>
+    </plurals>
+    <string name="next_occurrence">Próxima ocorrência: %1$s, %2$s</string>
+    <string name="no_occurrence_after">Depois disso, não há mais ocorrências.</string>
+    <string name="pause_title">Suspender alarme</string>
+    <string name="pause_current">Atual</string>
+    <string name="pause_end">Terminar pausa</string>
+    <string name="pause_heading_period">Suspender a partir de hoje durante</string>
+    <string name="pause_heading_occurrences">Ignorar as próximas ocorrências:</string>
+    <string name="pause_heading_replace_period">Nova pausa (substitui a atual) – suspender a partir de hoje durante</string>
+    <string name="pause_heading_replace_occurrences">Nova pausa (substitui a atual) – ignorar as próximas ocorrências:</string>
+    <string name="pause_count">número</string>
+    <string name="pause_preview">Suspenso até %s (inclusive)</string>
+    <string name="pause_until_date">Em vez disso, até uma data …</string>
+    <string name="pause_replace">Substituir pausa</string>
+    <string name="pause_confirm">Suspender</string>
+    <plurals name="unit_days">
+        <item quantity="one">dia</item>
+        <item quantity="other">dias</item>
+    </plurals>
+    <plurals name="unit_weeks">
+        <item quantity="one">semana</item>
+        <item quantity="other">semanas</item>
+    </plurals>
+    <plurals name="unit_months">
+        <item quantity="one">mês</item>
+        <item quantity="other">meses</item>
+    </plurals>
+    <plurals name="unit_years">
+        <item quantity="one">ano</item>
+        <item quantity="other">anos</item>
+    </plurals>
+    <plurals name="unit_occurrences">
+        <item quantity="one">ocorrência</item>
+        <item quantity="other">ocorrências</item>
+    </plurals>
+
+    <string name="type_once">Uma vez</string>
+    <string name="type_daily">Diariamente / a cada n dias</string>
+    <string name="type_weekly">Semanalmente / a cada n semanas</string>
+    <string name="type_monthly_day">Mensalmente num dia</string>
+    <string name="type_monthly_weekday">Mensalmente num dia da semana</string>
+    <string name="type_yearly">Anualmente</string>
+    <string name="hint_once">Toca uma única vez</string>
+    <string name="hint_daily">p. ex. a cada 3 dias</string>
+    <string name="hint_weekly">p. ex. às segundas-feiras, semana sim, semana não – semanas alternadas, turnos ou horários escolares</string>
+    <string name="hint_monthly_day">p. ex. no dia 15 ou no último dia</string>
+    <string name="hint_monthly_weekday">p. ex. na primeira terça-feira do mês</string>
+    <string name="hint_yearly">p. ex. todos os anos a 8 de out.</string>
+    <string name="interval">Intervalo</string>
+    <plurals name="interval_prefix_days">
+        <item quantity="one">A cada</item>
+        <item quantity="other">A cada</item>
+    </plurals>
+    <plurals name="interval_prefix_weeks">
+        <item quantity="one">A cada</item>
+        <item quantity="other">A cada</item>
+    </plurals>
+    <plurals name="interval_prefix_months">
+        <item quantity="one">A cada</item>
+        <item quantity="other">A cada</item>
+    </plurals>
+    <plurals name="interval_prefix_years">
+        <item quantity="one">A cada</item>
+        <item quantity="other">A cada</item>
+    </plurals>
+    <string name="on_these_days">Nestes dias</string>
+    <string name="on_day">No dia</string>
+    <string name="day_of_month">%d</string>
+    <string name="day_of_month_what">dia</string>
+    <string name="last_day_of_month">Último dia do mês</string>
+    <string name="short_month_hint">Nos meses mais curtos, o alarme toca no último dia do mês.</string>
+    <string name="which_in_month">Qual no mês</string>
+    <string name="weekday">Dia da semana</string>
+    <string name="yearly_hint">O alarme toca todos os anos no dia e no mês da data de início.</string>
+    <string name="starts_on">Começa a</string>
+    <string name="interval_counted_from">%s – o intervalo é contado a partir daqui</string>
+    <string name="ends">Termina</string>
+    <string name="ends_after">Depois de %s</string>
+    <string name="no_end">Sem fim</string>
+    <string name="date">Data</string>
+    <string name="next_time_reached">Da próxima vez que chegar essa hora</string>
+    <string name="no_date">Sem data</string>
+    <string name="upcoming">Próximas ocorrências</string>
+
+    <string name="default_snooze">Duração predefinida do adiamento</string>
+    <string name="default_snooze_sub">%s – para alarmes sem duração própria</string>
+    <string name="ring_for">O alarme para após</string>
+    <string name="ring_for_sub">%s sem resposta – depois recebe o aviso «Alarme perdido»</string>
+    <string name="ring_for_never_sub">Toca até responder</string>
+    <string name="default_ramp">Predefinição de «Aumentar gradualmente»</string>
+    <string name="default_ramp_sub">%s – para alarmes sem definição própria</string>
+    <string name="ramp_dialog_title">Aumentar o volume gradualmente</string>
+    <string name="flip_to_snooze">Virar para adiar</string>
+    <string name="flip_to_snooze_sub">Pousar o telefone com o ecrã para baixo adia um alarme que está a tocar. Para adiar de novo mais tarde, levante-o primeiro.</string>
+    <string name="reliability">Fiabilidade</string>
+    <string name="all_set">Tudo pronto – os alarmes tocam mesmo com Não incomodar e com a poupança de bateria.</string>
+    <string name="test_advice">O ideal é testar o alarme uma vez com o ecrã bloqueado e Não incomodar ativado. Importante: «Forçar paragem» («Forçar parada») nas informações da app apaga todos os alarmes agendados até voltar a abrir a app.</string>
+    <string name="test_alarm_label">Alarme de teste</string>
+    <string name="test_alarm_toast">O alarme de teste toca dentro de 1 minuto – bloqueie já o ecrã</string>
+    <string name="test_alarm_button">Alarme de teste dentro de 1 minuto</string>
+
+    <string name="ramp_off">Desligado – volume máximo de imediato</string>
+    <plurals name="ramp_seconds">
+        <item quantity="one">Aumentar ao longo de %d segundo</item>
+        <item quantity="other">Aumentar ao longo de %d segundos</item>
+    </plurals>
+    <plurals name="ramp_minutes">
+        <item quantity="one">Aumentar ao longo de %d minuto</item>
+        <item quantity="other">Aumentar ao longo de %d minutos</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%d minuto</item>
+        <item quantity="other">%d minutos</item>
+    </plurals>
+
+    <string name="default_sound">Som de alarme predefinido</string>
+    <string name="default_sound_named">Som de alarme predefinido (%s)</string>
+    <string name="builtin_sound">Bipe integrado</string>
+    <string name="custom_file">Ficheiro próprio</string>
+    <string name="alarm_sounds">Sons de alarme</string>
+    <string name="ringtones">Toques</string>
+    <string name="file_import_failed">Não foi possível usar o ficheiro (demasiado grande ou ilegível).</string>
+    <string name="file_importing">A importar o ficheiro …</string>
+    <string name="file_choose">Escolher um ficheiro de áudio próprio …</string>
+    <string name="sounds_loading">A carregar sons …</string>
+
+    <string name="channel_ringing">Alarme a tocar</string>
+    <string name="channel_ringing_desc">Mostra o alarme que está a tocar, também no ecrã de bloqueio</string>
+    <string name="channel_emergency">Alarme (emergência)</string>
+    <string name="channel_emergency_desc">Toca se o som normal do alarme não puder ser iniciado</string>
+    <string name="channel_missed">Alarmes perdidos</string>
+    <string name="channel_missed_desc">Aviso quando um alarme foi perdido ou parou sem resposta</string>
+    <string name="emergency_text">Não foi possível iniciar o som normal do alarme.</string>
+    <string name="missed_title">Alarme perdido: %s</string>
+    <string name="missed_timeout">Parou após %s sem resposta</string>
+    <string name="missed_interrupted">O toque foi interrompido pelo sistema</string>
+    <string name="missed_replaced">Substituído por outro alarme</string>
+    <string name="missed_not_fired">Não tocou – dispositivo desligado ou hora alterada</string>
+
+    <string name="action_allow">Permitir</string>
+    <string name="action_change">Alterar</string>
+    <string name="action_sounds">Som</string>
+    <string name="action_storage">Armazenamento</string>
+    <string name="action_exception">Exceção</string>
+    <string name="issue_notifications_title">As notificações estão desativadas</string>
+    <string name="issue_notifications_text">Sem elas, o alarme que toca não aparece no ecrã.</string>
+    <string name="issue_fullscreen_title">Ecrã inteiro não permitido</string>
+    <string name="issue_fullscreen_text">O alarme não consegue então aparecer sobre o ecrã de bloqueio.</string>
+    <string name="issue_exact_title">Alarmes exatos não permitidos</string>
+    <string name="issue_exact_text">Sem esta permissão, o Android pode atrasar o alarme.</string>
+    <string name="issue_volume_title">O volume do alarme está a 0</string>
+    <string name="issue_volume_text">O alarme apenas vibraria. Aumente o volume do alarme nas definições de som.</string>
+    <string name="issue_dnd_silent_title">Não incomodar está em «Silêncio total»</string>
+    <string name="issue_dnd_silent_text">Neste modo, o Android também não deixa tocar nenhum alarme.</string>
+    <string name="issue_dnd_blocks_title">Não incomodar bloqueia alarmes</string>
+    <string name="issue_dnd_blocks_text">Permita a categoria «Alarmes» no modo Não incomodar ativo.</string>
+    <string name="issue_restricted_title">A utilização da bateria está «Restrita»</string>
+    <string name="issue_restricted_text">Alguns fabricantes bloqueiam então o alarme em segundo plano. «Otimizada» ou «Sem restrições» é mais seguro.</string>
+    <string name="issue_channel_title">Notificação «Alarme a tocar» reduzida</string>
+    <string name="issue_channel_text">O alarme que toca não aparece então no ecrã. Volte a colocar a categoria em «Mostrar no ecrã/Urgente».</string>
+    <string name="issue_damaged_title">Os alarmes guardados estavam danificados</string>
+    <string name="issue_damaged_text">Não foi possível ler alguns alarmes – verifique a lista e volte a criar os alarmes em falta. Os alarmes já agendados continuam a tocar.</string>
+    <string name="issue_write_title">Não foi possível guardar os alarmes</string>
+    <string name="issue_write_text">Provavelmente o armazenamento está cheio. Caso contrário, as últimas alterações perdem-se após um reinício.</string>
+    <string name="issue_battery_title">A otimização da bateria está ativa</string>
+    <string name="issue_battery_text">O próprio Android deixa os alarmes tocar, mas alguns fabricantes terminam a app em segundo plano. Uma exceção torna o alarme mais fiável nesses dispositivos.</string>
+
+    <string name="fmt_date">EEE, d \'de\' MMM</string>
+    <string name="fmt_date_year">EEE, d \'de\' MMM \'de\' yyyy</string>
+    <string name="fmt_day_month">d \'de\' MMM</string>
+    <string name="until">em %s</string>
+    <string name="until_less_than_minute">em menos de 1 min</string>
+    <plurals name="until_days">
+        <item quantity="one">%d dia</item>
+        <item quantity="other">%d dias</item>
+    </plurals>
+    <plurals name="hours_short">
+        <item quantity="one">%d h</item>
+        <item quantity="other">%d h</item>
+    </plurals>
+    <plurals name="minutes_short">
+        <item quantity="one">%d min</item>
+        <item quantity="other">%d min</item>
+    </plurals>
+    <string name="list_separator">", "</string>
+    <string name="list_and">%1$s e %2$s</string>
+    <string name="every_day">Todos os dias</string>
+    <string name="workdays">seg.–sex.</string>
+    <string-array name="weekdays_short">
+        <item>Seg</item>
+        <item>Ter</item>
+        <item>Qua</item>
+        <item>Qui</item>
+        <item>Sex</item>
+        <item>Sáb</item>
+        <item>Dom</item>
+    </string-array>
+    <string-array name="weekdays_abbr">
+        <item>seg.</item>
+        <item>ter.</item>
+        <item>qua.</item>
+        <item>qui.</item>
+        <item>sex.</item>
+        <item>sáb.</item>
+        <item>dom.</item>
+    </string-array>
+    <string-array name="weekdays_long">
+        <item>segunda-feira</item>
+        <item>terça-feira</item>
+        <item>quarta-feira</item>
+        <item>quinta-feira</item>
+        <item>sexta-feira</item>
+        <item>sábado</item>
+        <item>domingo</item>
+    </string-array>
+    <string-array name="weekday_gender">
+        <item>f</item>
+        <item>f</item>
+        <item>f</item>
+        <item>f</item>
+        <item>f</item>
+        <item>m</item>
+        <item>m</item>
+    </string-array>
+    <string-array name="ordinals_m">
+        <item>o primeiro</item>
+        <item>o segundo</item>
+        <item>o terceiro</item>
+        <item>o quarto</item>
+        <item>o último</item>
+    </string-array>
+    <string-array name="ordinals_f">
+        <item>a primeira</item>
+        <item>a segunda</item>
+        <item>a terceira</item>
+        <item>a quarta</item>
+        <item>a última</item>
+    </string-array>
+    <string-array name="ordinal_chips">
+        <item>1.º</item>
+        <item>2.º</item>
+        <item>3.º</item>
+        <item>4.º</item>
+        <item>Último</item>
+    </string-array>
+    <string name="weekday_group">%1$s %2$s</string>
+    <string name="desc_once">Uma vez</string>
+    <string name="desc_once_on">Uma vez, %s</string>
+    <string name="desc_daily">Diariamente</string>
+    <string name="desc_every_n_days">A cada %d dias</string>
+    <string name="desc_every_n_weeks">A cada %1$d semanas: %2$s</string>
+    <string name="desc_monthly_on_day">Todos os meses no dia %d</string>
+    <string name="desc_monthly_last_day">Todos os meses no último dia</string>
+    <string name="desc_every_n_months_on_day">A cada %1$d meses no dia %2$d</string>
+    <string name="desc_every_n_months_last_day">A cada %d meses no último dia</string>
+    <string name="desc_monthly_weekday">Todos os meses: %s</string>
+    <string name="desc_every_n_months_weekday">A cada %1$d meses: %2$s</string>
+    <string name="desc_yearly">Todos os anos a %s</string>
+    <string name="desc_every_n_years">A cada %1$d anos a %2$s</string>
+    <string name="desc_with_end">%1$s · até %2$s</string>
+
+    <string name="help_repeat_title">Alarmes repetidos</string>
+    <string name="help_repeat_text">Toque na linha de repetição de um alarme para escolher uma regra:\n• Uma vez – numa data ou da próxima vez que chegar a hora\n• A cada n dias – p. ex. a cada 3 dias\n• A cada n semanas nos dias escolhidos – p. ex. segunda e quinta-feira, semana sim, semana não\n• Mensalmente num dia – p. ex. no dia 15 ou no último dia\n• Mensalmente num dia da semana – p. ex. a primeira e a terceira quinta-feira ou a última sexta-feira\n• Anualmente\nCada regra pode ter uma data de fim. A pré-visualização mostra as próximas ocorrências.\nOs círculos dos dias no cartão funcionam como no relógio do Android.</string>
+    <string name="help_timetable_title">Semanas alternadas e horários</string>
+    <string name="help_timetable_text">Para um ritmo que muda de semana para semana – semanas A/B na escola, turnos da manhã e da tarde, um horário da universidade –, crie um alarme por padrão com «A cada 2 semanas», p. ex. às 6:00 de segunda a quarta e às 8:30 à quinta e à sexta.\nA data de início decide que semana conta: o intervalo é contado a partir da semana da data de início. Para a outra semana, dê a um segundo alarme uma data de início uma semana mais tarde.\nTambém funcionam ciclos mais longos, p. ex. a cada 3 ou 4 semanas.</string>
+    <string name="help_pause_title">Suspender</string>
+    <string name="help_pause_text">Os alarmes repetidos podem ser suspensos – por exemplo, nas férias. Escolha dias, semanas ou meses a partir de hoje, um número de ocorrências a ignorar ou uma última data. A caixa de diálogo mostra que ocorrências são ignoradas. Depois da pausa, o alarme continua sozinho.</string>
+    <string name="help_ringing_title">Adiar, volume e som</string>
+    <string name="help_ringing_text">A duração do adiamento e «Aumentar gradualmente» podem ser definidos por alarme ou como predefinição nas definições. Um alarme que está a tocar para sozinho após o tempo escolhido nas definições e mostra então o aviso «Alarme perdido».\nPode usar os sons de alarme e os toques do dispositivo ou um ficheiro de áudio próprio. O seu ficheiro é copiado para a app, para que continue a tocar após um reinício.</string>
+    <string name="help_reliability_title">Fiabilidade</string>
+    <string name="help_reliability_text">Os alarmes usam a função de despertador do Android e tocam em modo Doze, com a poupança de bateria e com Não incomodar (se os alarmes forem permitidos aí). Após um reinício, funcionam mesmo antes do primeiro desbloqueio.\nA app verifica as permissões, o volume do alarme e o Não incomodar e mostra avisos na lista e nas definições.\nImportante: «Forçar paragem» («Forçar parada») nas informações da app apaga todos os alarmes agendados até voltar a abrir a app.\nSe o som normal não puder iniciar, toca em vez dele um alarme de emergência com notificação. Se um alarme não pôde tocar (dispositivo desligado, hora alterada), recebe o aviso «Alarme perdido».\nDica: experimente uma vez o alarme de teste nas definições com o ecrã bloqueado.</string>
+    <string name="help_flip_title">Virar para adiar</string>
+    <string name="help_flip_text">Quando um alarme está a tocar, pouse o telefone com o ecrã para baixo para o adiar. Após o tempo de adiamento, volta a tocar. Se o telefone ainda estiver virado para baixo, levante-o e volte a pousá-lo – ou toque em «Adiar». O sensor de movimento só funciona enquanto um alarme está a tocar. Pode desativar esta função nas definições.</string>
+    <string name="help_privacy_title">Privacidade</string>
+    <string name="help_privacy_text">A app não tem permissão de acesso à Internet. Todos os alarmes ficam no seu dispositivo.</string>
+    <string name="help_about_title">Acerca de</string>
+    <string name="help_about_text">Versão %1$s\nSoftware livre sob a GNU General Public License v3.0.\nCódigo-fonte e problemas: %2$s</string>
+</resources>

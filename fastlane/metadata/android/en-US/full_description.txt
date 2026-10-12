@@ -1,0 +1,31 @@
+<p><b>An alarm clock that follows your rhythm – even when it changes from week to week.</b></p>
+
+<p>Alternating A/B weeks at school, early and late shifts, a uni timetable that differs every other week: with Wake Me you set each alarm once with a flexible rule and it simply goes off on the right days. No more switching alarms on and off every Sunday evening.</p>
+
+<p><b>Rules the built-in clock app can't do</b></p>
+<ul>
+<li><b>Every n weeks</b> on chosen weekdays – e.g. every other week on Monday and Thursday; the start date decides which week counts</li>
+<li><b>Monthly on a weekday</b> – e.g. the 1st Tuesday, the 1st and 3rd Thursday or the last Friday of the month</li>
+<li><b>Monthly on a day</b> – e.g. on the 15th or on the last day of the month</li>
+<li>Every n days, yearly or once – each with a start date and an optional end date</li>
+</ul>
+<p>A preview shows the next occurrences, so you can see at a glance whether the rule is right.</p>
+
+<p><b>Pause instead of deleting</b><br/>
+Going on holiday? Pause repeating alarms for days, weeks or months, for a number of occurrences or up to a date. The app lists which occurrences are skipped and resumes by itself afterwards.</p>
+
+<p><b>Waking up</b></p>
+<ul>
+<li>Turn the phone face down to snooze</li>
+<li>Snooze length and gradually increasing volume per alarm or as a default</li>
+<li>Device alarm sounds, ringtones or your own audio file</li>
+<li>Rings reliably in Doze, battery saver and Do Not Disturb, and after a restart even before the first unlock</li>
+<li>Checks permissions, alarm volume and Do Not Disturb and warns you about anything that would stop the alarm</li>
+<li>“Missed alarm” notice if the device was off or the alarm stopped without a response</li>
+<li>Test alarm in 1 minute</li>
+</ul>
+
+<p><b>Privacy</b><br/>
+No internet permission, no ads, no tracking. Your alarms stay on your device.</p>
+
+<p>Available in English, German, French, Spanish, Italian, Portuguese and Dutch; the app follows the system language.</p>

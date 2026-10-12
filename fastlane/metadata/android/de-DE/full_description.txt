@@ -1,0 +1,31 @@
+<p><b>Ein Wecker, der deinem Rhythmus folgt – auch wenn er sich von Woche zu Woche ändert.</b></p>
+
+<p>A/B-Wochen in der Schule, Früh- und Spätschicht, ein Stundenplan an der Uni, der jede zweite Woche anders aussieht: Mit „Weck mich“ stellst du jeden Wecker einmal mit einer flexiblen Regel ein, und er klingelt einfach an den richtigen Tagen. Kein Ein- und Ausschalten mehr jeden Sonntagabend.</p>
+
+<p><b>Regeln, die die eingebaute Uhr nicht kann</b></p>
+<ul>
+<li><b>Alle n Wochen</b> an bestimmten Wochentagen – z. B. jede 2. Woche Montag und Donnerstag; das Startdatum legt fest, welche Woche zählt</li>
+<li><b>Monatlich an einem Wochentag</b> – z. B. jeden 1. Dienstag, jeden 1. und 3. Donnerstag oder den letzten Freitag im Monat</li>
+<li><b>Monatlich an einem Tag</b> – z. B. am 15. oder am letzten Tag des Monats</li>
+<li>Alle n Tage, jährlich oder einmalig – jeweils mit Startdatum und optionalem Enddatum</li>
+</ul>
+<p>Eine Vorschau zeigt die nächsten Termine, so siehst du sofort, ob die Regel stimmt.</p>
+
+<p><b>Aussetzen statt löschen</b><br/>
+Urlaub? Wiederkehrende Wecker für Tage, Wochen oder Monate, für eine Anzahl Termine oder bis zu einem Datum aussetzen. Die App zeigt, welche Termine entfallen, und klingelt danach von selbst wieder.</p>
+
+<p><b>Aufwachen</b></p>
+<ul>
+<li>Handy umdrehen zum Schlummern</li>
+<li>Schlummerdauer und ansteigende Lautstärke pro Wecker oder als Standard</li>
+<li>Weck- und Klingeltöne des Geräts oder eine eigene Audiodatei</li>
+<li>Klingelt zuverlässig im Ruhe- und Stromsparmodus und bei „Nicht stören“, nach einem Neustart schon vor dem ersten Entsperren</li>
+<li>Prüft Berechtigungen, Weckerlautstärke und „Nicht stören“ und warnt vor allem, was das Klingeln verhindern würde</li>
+<li>Hinweis „Verpasster Wecker“, wenn das Gerät aus war oder der Wecker ohne Reaktion verstummt ist</li>
+<li>Probewecker in 1 Minute</li>
+</ul>
+
+<p><b>Datenschutz</b><br/>
+Keine Internet-Berechtigung, keine Werbung, kein Tracking. Deine Wecker bleiben auf deinem Gerät.</p>
+
+<p>Auf Deutsch, Englisch, Französisch, Spanisch, Italienisch, Portugiesisch und Niederländisch; die App folgt der Systemsprache.</p>

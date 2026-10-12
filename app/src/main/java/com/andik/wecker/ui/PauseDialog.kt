@@ -1,5 +1,8 @@
 package com.andik.wecker.ui
 
+import androidx.compose.ui.res.pluralStringResource
+import com.andik.wecker.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -33,21 +36,22 @@ private fun day(d: LocalDate, today: LocalDate) = Format.date(d, withYear = d.ye
  * „wieder ab Mi., 9. Dez.“ las sich, als klinge der Wecker an diesem Mittwoch. */
 fun pauseText(alarm: Alarm, today: LocalDate): String? =
     alarm.pausedUntil?.takeIf { alarm.isPaused(today) }?.let {
-        "Pausiert bis einschließlich ${day(it.minusDays(1), today)}"
+        Format.texts.str(R.string.paused_through, day(it.minusDays(1), today))
     }
 
 /** „Es entfallen 2 Termine: Mo., 12. Okt. · Mo., 19. Okt.“ – bei vielen nur die ersten. */
 private fun skippedText(skipped: List<LocalDateTime>, today: LocalDate): String {
-    if (skipped.isEmpty()) return "Es entfällt kein Termin."
+    val t = Format.texts
+    if (skipped.isEmpty()) return t.str(R.string.skipped_none)
     val shown = skipped.take(4).joinToString(" · ") { day(it.toLocalDate(), today) }
     val rest = skipped.size - 4
-    val more = when { rest <= 0 -> ""; rest == 1 -> " und 1 weiterer"; else -> " und $rest weitere" }
-    return if (skipped.size == 1) "Es entfällt 1 Termin: $shown" else "Es entfallen ${skipped.size} Termine: $shown$more"
+    val more = if (rest > 0) " " + t.plural(R.plurals.skipped_more, rest) else ""
+    return t.plural(R.plurals.skipped, skipped.size, skipped.size, shown + more)
 }
 
 private fun nextText(next: LocalDateTime?, today: LocalDate): String =
-    next?.let { "Nächster Termin: ${day(it.toLocalDate(), today)}, ${Format.time(it)}" }
-        ?: "Danach gibt es keinen Termin mehr."
+    next?.let { Format.texts.str(R.string.next_occurrence, day(it.toLocalDate(), today), Format.time(it)) }
+        ?: Format.texts.str(R.string.no_occurrence_after)
 
 /**
  * Setzt einen wiederholenden Wecker für eine Zeit aus: ab heute für n Tage/Wochen/Monate oder bis
@@ -89,34 +93,39 @@ fun PauseDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Wecker aussetzen") },
+        title = { Text(stringResource(R.string.pause_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 if (paused) {
-                    Text("Aktuell", style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.pause_current), style = MaterialTheme.typography.titleSmall)
                     Text(pauseText(alarm, today).orEmpty(), color = MaterialTheme.colorScheme.primary)
                     Text(nextText(currentNext, today), style = MaterialTheme.typography.bodySmall)
-                    TextButton(onClick = onResume, modifier = Modifier.padding(start = 0.dp)) { Text("Pause beenden") }
+                    TextButton(onClick = onResume, modifier = Modifier.padding(start = 0.dp)) { Text(stringResource(R.string.pause_end)) }
                     HorizontalDivider()
                 }
                 Text(
-                    ((if (paused) "Neue Pause (ersetzt die aktuelle) – " else "") +
-                        if (unit == PauseUnit.OCCURRENCES) "die nächsten Termine auslassen:" else "ab heute aussetzen für")
-                        .replaceFirstChar { it.uppercase() },
+                    stringResource(
+                        when {
+                            paused && unit == PauseUnit.OCCURRENCES -> R.string.pause_heading_replace_occurrences
+                            paused -> R.string.pause_heading_replace_period
+                            unit == PauseUnit.OCCURRENCES -> R.string.pause_heading_occurrences
+                            else -> R.string.pause_heading_period
+                        },
+                    ),
                     style = MaterialTheme.typography.titleSmall,
                 )
-                Stepper(amount, 1..maxAmount, "$amount", what = "Anzahl") { amount = it }
+                Stepper(amount, 1..maxAmount, "$amount", what = stringResource(R.string.pause_count)) { amount = it }
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     PauseUnit.entries.forEach { u ->
                         FilterChip(
                             selected = u == unit,
                             onClick = { unit = u },
-                            label = { Text(if (amount == 1) u.one else u.many) },
+                            label = { Text(pluralStringResource(u.label, amount)) },
                         )
                     }
                 }
                 Text(
-                    "Ausgesetzt bis einschließlich ${day(resume.minusDays(1), today)}",
+                    stringResource(R.string.pause_preview, day(resume.minusDays(1), today)),
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 Text(skippedText(skipped, today), style = MaterialTheme.typography.bodyMedium)
@@ -125,11 +134,11 @@ fun PauseDialog(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                TextButton(onClick = { pickDate = true }) { Text("Stattdessen bis einschließlich Datum …") }
+                TextButton(onClick = { pickDate = true }) { Text(stringResource(R.string.pause_until_date)) }
             }
         },
-        confirmButton = { TextButton(onClick = { onPause(resume, amount, unit) }) { Text(if (paused) "Pause ersetzen" else "Aussetzen") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Abbrechen") } },
+        confirmButton = { TextButton(onClick = { onPause(resume, amount, unit) }) { Text(stringResource(if (paused) R.string.pause_replace else R.string.pause_confirm)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 
     if (pickDate) {

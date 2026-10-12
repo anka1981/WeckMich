@@ -1,5 +1,8 @@
 package com.andik.wecker.ui
 
+import com.andik.wecker.model.Format
+import com.andik.wecker.R
+import androidx.compose.ui.res.stringResource
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -58,13 +61,13 @@ fun WeckerTheme(content: @Composable () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickDialog(hour: Int, minute: Int, onDismiss: () -> Unit, onConfirm: (Int, Int) -> Unit) {
-    val state = rememberTimePickerState(initialHour = hour, initialMinute = minute, is24Hour = true)
+    val state = rememberTimePickerState(initialHour = hour, initialMinute = minute, is24Hour = Format.texts.is24Hour)
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Uhrzeit") },
+        title = { Text(stringResource(R.string.time)) },
         text = { TimePicker(state = state) },
-        confirmButton = { TextButton(onClick = { onConfirm(state.hour, state.minute) }) { Text("OK") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Abbrechen") } },
+        confirmButton = { TextButton(onClick = { onConfirm(state.hour, state.minute) }) { Text(stringResource(R.string.ok)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 }
 
@@ -93,9 +96,9 @@ fun DatePickDialog(
                 state.selectedDateMillis?.let {
                     onConfirm(Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate())
                 } ?: onDismiss()
-            }) { Text("OK") }
+            }) { Text(stringResource(R.string.ok)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Abbrechen") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     ) { DatePicker(state = state) }
 }
 
@@ -128,16 +131,17 @@ fun <T> OptionDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Abbrechen") } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 }
 
 /** − Wert + */
 @Composable
-fun Stepper(value: Int, range: IntRange, label: String, what: String = "", onChange: (Int) -> Unit) {
+/** [what] benennt den Wert für Bildschirmleser („Anzahl verringern“). */
+fun Stepper(value: Int, range: IntRange, label: String, what: String, onChange: (Int) -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FilledTonalIconButton(onClick = { onChange(value - 1) }, enabled = value > range.first) {
-            Icon(Icons.Filled.Remove, "$what verringern".trim())
+            Icon(Icons.Filled.Remove, stringResource(R.string.decrease, what))
         }
         Text(
             label,
@@ -146,7 +150,7 @@ fun Stepper(value: Int, range: IntRange, label: String, what: String = "", onCha
             modifier = Modifier.widthIn(min = 56.dp),
         )
         FilledTonalIconButton(onClick = { onChange(value + 1) }, enabled = value < range.last) {
-            Icon(Icons.Filled.Add, "$what erhöhen".trim())
+            Icon(Icons.Filled.Add, stringResource(R.string.increase, what))
         }
     }
 }

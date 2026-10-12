@@ -1,5 +1,6 @@
 package com.andik.wecker
 
+import com.andik.wecker.model.Format
 import com.andik.wecker.data.SoundFiles
 import android.app.Application
 import com.andik.wecker.alarm.AlarmService
@@ -9,6 +10,7 @@ import com.andik.wecker.data.AlarmStore
 class WeckerApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        Format.init(this)
         AlarmStore.init(this)
         AlarmService.createChannel(this)
         MissedNotifier.createChannel(this)
