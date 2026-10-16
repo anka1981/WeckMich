@@ -25,3 +25,5 @@ in `app/build.gradle.kts` die Build-Tools-Version fest vorgegeben sowie `depende
 4. GitHub-Release `v<versionName>` mit der APK als `WeckMich-<versionName>.apk` anlegen.
 
 Mit `UpdateCheckMode: Tags` findet F-Droid neue Versionen anhand der Tags von selbst.
+Im Rezept steht unter `commit:` immer der **volle Commit-Hash** des Tags, nicht der Tag selbst
+(Vorgabe der F-Droid-Prüfer).

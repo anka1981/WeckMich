@@ -23,7 +23,7 @@ Binaries: https://github.com/anka1981/WeckMich/releases/download/v%v/WeckMich-%v
 Builds:
   - versionName: '1.6'
     versionCode: 8
-    commit: v1.6
+    commit: cdcf8d5f524038a25db551cbb72189eeaaa569a1
     subdir: app
     gradle:
       - yes
