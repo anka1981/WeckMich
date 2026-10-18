@@ -53,6 +53,16 @@ Die Texte stehen in `app/src/main/res/values*/strings.xml`; Englisch (`values/`)
 Beschreibungen von Wiederholungsregeln werden aus Bausteinen zusammengesetzt (`model/Format.kt`) –
 Ordinalzahlen, Geschlecht der Wochentage und Satzmuster sind je Sprache in den Ressourcen festgelegt.
 
+## KI-Unterstützung / AI assistance
+
+Diese App wurde mit Unterstützung von Claude (KI-Programmierassistent von Anthropic) entwickelt.
+Commits mit KI-Anteil tragen eine `Co-Authored-By: Claude …`-Zeile. Der Maintainer steuert die
+Entwicklung, prüft die Änderungen und testet die App auf einem echten Gerät.
+
+This app was developed with the help of Claude, Anthropic's AI coding assistant. Commits with AI
+contributions carry a `Co-Authored-By: Claude …` trailer. The maintainer directs the development,
+reviews the changes and tests the app on a real device.
+
 ## Lizenz
 
 GNU General Public License, nur Version 3 (GPL-3.0-only) – siehe [LICENSE](LICENSE). Der eingebaute Ersatz-Piepton
